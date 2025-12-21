@@ -22,9 +22,9 @@ Heavily inspired by the Elektron Digitone hardware synthesizer, it utilizes a cl
 1. **Install Dependencies:**
    Install the required Python libraries by running the following command in your terminal:
 
-   ``bash
+   ```bash
    pip install firebase-admin numpy flask
-   ``
+   ```
 
 2. **Database Configuration:**
     This project uses Google Firebase (Firestore) to save your synth presets and sequences. Since this is a web application, you need your own "backend" in the cloud. Follow these steps carefully:
