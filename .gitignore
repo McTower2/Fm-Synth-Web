@@ -1,2 +1,3 @@
 ./static/firebase/firebase-config.js
 .DS_Store
+pycache/*.py[cod]*$py.classvenv/env/.env
