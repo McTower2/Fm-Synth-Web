@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Fm WebSynth</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="https://g200kg.github.io/webaudio-controls/webaudio-controls.js"></script>
+  </head>
+  <body>
+    <div class="rack-module">
+      <!-- <h1 class="rack-title">Python FM Synth</h1> -->
+
+      <div class="synth-section-container">
+
+        <!-- OPERATOR A SECTION -->
+        <div class="synth-section">
+          <div class="section-title">Operator A</div>
+
+            <div class="section-body"> 
+              <div class="knobs-col left-controls">
+                <!-- A KNOBS -->
+                <div class="control-wrapper">
+                  <span class="label">RATIO</span>
+                  <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
+                    id="ratio_A" min="0.25" max="16.0" value="1" step="0.001" tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
+                    onchange="sendParam('ratio_A', this.value)"
+                  ></webaudio-knob> <webaudio-param link="ratio_A" fontsize="9"></webaudio-param>
+                </div>
+
+                <div class="control-wrapper">
+                  <span class="label">FEEDBACK</span>
+                  <webaudio-knob  src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
+                    id="feedback_A" min="0" max="5" value="0" step="0.001" tooltip="Waveform shaper. Morph: Sine › Saw › Noise."
+                    onchange="sendParam('feedback_A', this.value)"   
+                  ></webaudio-knob><webaudio-param link="feedback_A" fontsize="9"></webaudio-param>
+                </div>
+
+                <div class="control-wrapper">
+                  <span class="label">MOD LEVEL</span>
+                  <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
+                    id="level_A" min="0" max="10" value="0" step="0.001" tooltip="Modulation Depth"
+                    onchange="sendParam('level_A', this.value)"
+                    ></webaudio-knob><webaudio-param link="level_A" fontsize="9"></webaudio-param>
+                </div>
+
+              </div>
+              <!-- OPERATOR A adsr -->
+              <div class="adsr-col">
+                <div><canvas id="adsrCanvas_A" class="adsrCanvas" width="160" height="90"></canvas>
+                </div>
+                <!-- adsr sliders -->
+                <div class="knobs-row adsr-sliders">
+                  
+                  <div class="control-wrapper">
+                    <span class="label">A</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="attack_A" min="0" max="2000" value="0" step="0.1" tooltip="ATTACK A (ms)" direction="vert"
+                      onchange="sendParam('attack_A', this.value)"   
+                    ></webaudio-slider><webaudio-param link="attack_A" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">D</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="decay_A" min="10" max="3000" value="200" step="0.1" tooltip="DECAY A (ms)" direction="vert"
+                      onchange="sendParam('decay_A', this.value)"   
+                    ></webaudio-slider><webaudio-param link="decay_A" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">S</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="sustain_A" min="0" max="1" value="1" step="0.001" tooltip="SUSTAIN A (ms)" direction="vert"
+                      onchange="sendParam('sustain_A', this.value)"   
+                    ></webaudio-slider>
+                    <webaudio-param link="sustain_A" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">R</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="release_A" min="10" max="2000" value="300" step="0.1" tooltip="RELEASE A (ms)" direction="vert"
+                      onchange="sendParam('release_A', this.value)"   
+                    ></webaudio-slider><webaudio-param link="release_A" fontsize="9"></webaudio-param>
+                  </div>  
+
+                </div>
+              </div>
+            </div>
+        </div>
+        <!-- END OP A;   closed: "synth-section" -->
+        
+        <!-- "GENERALS" section -->
+        <div class="synth-section">
+          <div class="section-title">GENERALS</div>
+          <div class="knobs-col">
+
+            <div class="control-wrapper">
+              <span class="label">ALGORITHM</span>
+              <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                id="algorithm" class="horizontal-slider" min="1" max="8" value="1" step="1" tooltip="Operators configuration. (Bright: Modulator, Dark: Carrier)" direction="horz"
+                oninput="updateAlgoImage(this.value); setAdsrAlgorithm(this.value)"
+                onchange="setAlgorithm('algorithm', this.value)"   
+              ></webaudio-slider>
+              <webaudio-param link="algorithm" fontsize="9"></webaudio-param>
+            </div>
+
+            <div class="algorithm-display">
+                <img id="algoImage" src="/static/img//algorithms/1.png" alt="Algorithm">
+            </div>
+
+            <div class="control-wrapper">
+              <span class="label">MIX</span>
+              <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                id="mix" class="horizontal-slider" min="0" max="1" value="0.5" step="0.001" tooltip="Dual Layer Blend. Mixes the two sound buses (X/Y) together." direction="horz"
+                onchange="sendParam('mix', this.value)"   
+              ></webaudio-slider><webaudio-param link="mix" fontsize="9"></webaudio-param>
+            </div>
+
+          </div>
+        </div>
+        <!-- END "GENERALS" section -->
+
+        <!-- OPERATOR B2 SECTION -->
+        <div class="synth-section">
+          <div class="section-title">Operator B2</div>
+
+            <div class="section-body"> 
+              <div class="knobs-col left-controls">
+                <!-- B2 KNOBS -->
+                <div class="control-wrapper">
+                  <span class="label">RATIO</span>
+                  <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
+                    id="ratio_B2" min="0.25" max="16.0" value="1" step="0.001" tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
+                    onchange="sendParam('ratio_B2', this.value)"
+                  ></webaudio-knob> <webaudio-param link="ratio_B2" fontsize="9"></webaudio-param>
+                </div>
+
+                <div class="control-wrapper">
+                  <span class="label">FEEDBACK</span>
+                  <webaudio-knob  src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
+                    id="feedback_B2" min="0" max="5" value="0" step="0.001" tooltip="Waveform shaper. Morph: Sine › Saw › Noise."
+                    onchange="sendParam('feedback_B2', this.value)"   
+                  ></webaudio-knob><webaudio-param link="feedback_B2" fontsize="9"></webaudio-param>
+                </div>
+
+                <div class="control-wrapper">
+                  <span class="label">MOD LEVEL</span>
+                  <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
+                    id="level_B2" min="0" max="10" value="0" step="0.001" tooltip="Modulation Depth"
+                    onchange="sendParam('level_B2', this.value)"
+                    ></webaudio-knob><webaudio-param link="level_B2" fontsize="9"></webaudio-param>
+                </div>
+
+              </div>
+              <!-- OPERATOR B2 adsr -->
+              <div class="adsr-col">
+                <div><canvas id="adsrCanvas_B2" class="adsrCanvas" width="160" height="90"></canvas>
+                </div>
+                <!-- adsr sliders -->
+                <div class="knobs-row adsr-sliders">
+                  
+                  <div class="control-wrapper">
+                    <span class="label">A</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="attack_B2" min="0" max="2000" value="0" step="0.1" tooltip="ATTACK B2 (ms)" direction="vert"
+                      onchange="sendParam('attack_B2', this.value)"   
+                    ></webaudio-slider><webaudio-param link="attack_B2" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">D</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="decay_B2" min="10" max="3000" value="200" step="0.1" tooltip="DECAY B2 (ms)" direction="vert"
+                      onchange="sendParam('decay_B2', this.value)"   
+                    ></webaudio-slider><webaudio-param link="decay_B2" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">S</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="sustain_B2" min="0" max="1" value="1" step="0.001" tooltip="SUSTAIN B2 (ms)" direction="vert"
+                      onchange="sendParam('sustain_B2', this.value)"   
+                    ></webaudio-slider>
+                    <webaudio-param link="sustain_B2" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">R</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="release_B2" min="10" max="2000" value="300" step="0.1" tooltip="RELEASE B2 (ms)" direction="vert"
+                      onchange="sendParam('release_B2', this.value)"   
+                    ></webaudio-slider><webaudio-param link="release_B2" fontsize="9"></webaudio-param>
+                  </div>  
+
+                </div>
+              </div>
+            </div>
+        </div>
+        <!-- END OP B2;   closed: "synth-section" -->
+
+
+        <!-- LFO 1 --------------------------------------------------------------------------------------------- -->
+        <div class ="synth-section">
+          <div class="section-title">LFO 1</div>
+            <div class="knob-col">
+
+              <!-- dest -->
+              <div class="control-wrapper">
+                <span class="label">DESTINATION</span>
+                <div class="select-container">
+                  <select id="lfo1dest" onchange="sendLfoParam('dest', this.value, 1)">
+                    <option value="None">None</option><option value=0>Mix</option><option value=1>Volume</option><option value=2>A Ratio</option><option value=3>A Level</option><option value=4>A Feedback</option><option value=5>B1 Ratio</option><option value=6>B1 Level</option>
+                    <option value=7>B1 Feedback</option><option value=8>B2 Ratio</option><option value=9>B2 Level</option><option value=10>B2 Feedback</option><option value=11>C Ratio</option><option value=12>C Feedback</option>
+                  </select>
+                  <div class="select-arrow">▼</div>
+                </div>
+              </div>
+              
+              <!-- wave -->
+              <div class="control-wrapper">
+                <span class="label">WAVEFORM</span>
+                <div class="select-container">
+                  <select id="lfo1wave" onchange="sendLfoParam('wave', this.value, 1)">
+                    <option value=0>Sine</option><option value=1>Triangle</option><option value=2>Saw Up</option><option value=3>Saw Down</option><option value=4>Square</option>
+                  </select>
+                  <div class="select-arrow">▼</div>
+                </div>
+              </div>
+
+              <div class="control-wrapper">
+                <span class="label">AMOUNT</span>
+                <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                  id="lfo1amt" class="horizontal-slider" min="0" max="5" value="0.5" step="0.001" tooltip="LFO 1 MOD AMOUNT"direction="horz"
+                  width="100"
+                  onchange="sendLfoParam('amount', this.value, 1)"   
+                ></webaudio-slider><webaudio-param link="lfo1amt" fontsize="9"></webaudio-param>
+              </div>
+
+              <div class="control-wrapper">
+                <span class="label">RATE</span>
+                <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                  id="lfo1rate" class="horizontal-slider" min="0.01" max="20" value="1.0" step="0.001" tooltip="LFO 1 FREQUENCY" direction="horz"
+                  width="100"
+                  onchange="sendLfoParam('rate', this.value, 1)"   
+                ></webaudio-slider><webaudio-param link="lfo1rate" fontsize="9"></webaudio-param>
+              </div>
+
+              <div class="control-wrapper">
+                <span class="label">SMOOTHING</span>
+                <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                  id="lfo1smooth" class="horizontal-slider" min="0.0" max="1" value="0.0" step="0.001" tooltip="LFO 1 SMOOTHING" direction="horz"
+                  width="100"
+                  onchange="sendLfoParam('smooth', this.value, 1)"   
+                ></webaudio-slider><webaudio-param link="lfo1smooth" fontsize="9"></webaudio-param>
+              </div>
+            </div>
+        </div>
+        
+        <!-- LFO 2 -->
+        <div class ="synth-section">
+          <div class="section-title">LFO 2</div>
+          <div class="knob-col">
+
+              <!-- dest -->
+              <div class="control-wrapper">
+                <span class="label">DESTINATION</span>
+                <div class="select-container">
+                  <select id="lfo2dest" onchange="sendLfoParam('dest', this.value, 2)">
+                    <option value="None">None</option><option value=0>Mix</option><option value=1>Volume</option><option value=2>A Ratio</option><option value=3>A Level</option><option value=4>A Feedback</option><option value=5>B1 Ratio</option><option value=6>B1 Level</option>
+                    <option value=7>B1 Feedback</option><option value=8>B2 Ratio</option><option value=9>B2 Level</option><option value=10>B2 Feedback</option><option value=11>C Ratio</option><option value=12>C Feedback</option>
+                  </select>
+                  <div class="select-arrow">▼</div>
+                </div>
+              </div>
+              
+              <!-- wave -->
+              <div class="control-wrapper">
+                <span class="label">WAVEFORM</span>
+                <div class="select-container">
+                  <select id="lfo2wave" onchange="sendLfoParam('wave', this.value, 2)">
+                    <option value=0>Sine</option><option value=1>Triangle</option><option value=2>Saw Up</option><option value=3>Saw Down</option><option value=4>Square</option>
+                  </select>
+                  <div class="select-arrow">▼</div>
+                </div>
+              </div>
+
+              <div class="control-wrapper">
+                <span class="label">AMOUNT</span>
+                <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                  id="lfo2amt" class="horizontal-slider" min="0" max="5" value="0.5" step="0.001" tooltip="LFO 2 MOD AMOUNT"direction="horz"
+                  width="100"
+                  onchange="sendLfoParam('amount', this.value, 2)"   
+                ></webaudio-slider><webaudio-param link="lfo2amt" fontsize="9"></webaudio-param>
+              </div>
+
+              <div class="control-wrapper">
+                <span class="label">RATE</span>
+                <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                  id="lfo2rate" class="horizontal-slider" min="0.01" max="20" value="1.0" step="0.001" tooltip="LFO 2 FREQUENCY" direction="horz"
+                  width="100"
+                  onchange="sendLfoParam('rate', this.value, 2)"   
+                ></webaudio-slider><webaudio-param link="lfo2rate" fontsize="9"></webaudio-param>
+              </div>
+
+              <div class="control-wrapper">
+                <span class="label">SMOOTHING</span>
+                <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                  id="lfo2smooth" class="horizontal-slider" min="0.0" max="1" value="0.0" step="0.001" tooltip="LFO 2 SMOOTHING" direction="horz"
+                  width="100"
+                  onchange="sendLfoParam('smooth', this.value, 2)"   
+                ></webaudio-slider><webaudio-param link="lfo2smooth" fontsize="9"></webaudio-param>
+              </div>
+            </div>
+        </div>
+
+        <!-- END synth-section-container   -  end first big synth row -->
+      </div>
+      <!-- END synth-section-container   -  end first big synth row -->
+
+      <div class="synth-section-container">
+        <!-- OPERATOR C SECTION -->
+        <div class="synth-section">
+          <div class="section-title">OPERATOR C</div>
+          <div class="knobs-col">
+            <div class="control-wrapper">
+              <span class="label">RATIO</span>
+              <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
+                id="ratio_C" min="0.25" max="16.0" value="1" step="0.001" tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
+                onchange="sendParam('ratio_C', this.value)"
+                ></webaudio-knob>
+              <webaudio-param link="ratio_C" fontsize="9"></webaudio-param>
+            </div>
+
+            <div class="control-wrapper">
+              <span class="label">FEEDBACK</span>
+              <webaudio-knob  src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
+                id="feedback_C" min="0" max="5" value="0" step="0.001" tooltip="Waveform shaper. Morph: Sine › Saw › Noise.
+                onchange="sendParam('feedback_C', this.value)"
+              ></webaudio-knob><webaudio-param link="feedback_C" fontsize="9"></webaudio-param>
+            </div>
+          </div>
+        </div>
+        <!-- END OP C;   closed: "synth-section" -->
+
+        <!-- Master Controls -->
+        <div class="synth-section">
+          <div class="section-title">MASTER CTRLs</div>
+          <div class="section-body">
+            <div class="knobs-col left-controls">
+                
+                <div class="control-wrapper">
+                  <span class="label">MASTER VOL</span>
+                  <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="50"
+                    id="master_vol" min="0" max="1.0" value="1" step="0.001" tooltip="Master volume"
+                    onchange="sendParam('master_vol', this.value)"
+                  ></webaudio-knob> <webaudio-param link="master_vol" fontsize="9"></webaudio-param>
+                </div>
+                <button id="load-synth-preset" class="synth-button">Load</button>
+                <button id="save-synth-preset" class="synth-button">Save</button>
+            </div>
+            <!-- AMP adsr -->
+              <div class="adsr-col">
+                <div><canvas id="adsrCanvas_amp" class="adsrCanvas" width="160" height="90"></canvas>
+                </div>
+                <!-- adsr sliders -->
+                <div class="knobs-row adsr-sliders">
+                  
+                  <div class="control-wrapper">
+                    <span class="label">A</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="attack_amp" min="5" max="2000" value="10" step="0.1" tooltip="ATTACK amp (ms)" direction="vert"
+                      onchange="sendParam('attack_amp', this.value)"   
+                    ></webaudio-slider><webaudio-param link="attack_amp" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">D</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="decay_amp" min="10" max="3000" value="300" step="0.1" tooltip="DECAY amp (ms)" direction="vert"
+                      onchange="sendParam('decay_amp', this.value)"   
+                    ></webaudio-slider><webaudio-param link="decay_amp" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">S</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="sustain_amp" min="0" max="1" value="0.8" step="0.001" tooltip="SUSTAIN amp (ms)" direction="vert"
+                      onchange="sendParam('sustain_amp', this.value)"   
+                    ></webaudio-slider>
+                    <webaudio-param link="sustain_amp" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">R</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="release_amp" min="10" max="2000" value="400" step="0.1" tooltip="RELEASE amp (ms)" direction="vert"
+                      onchange="sendParam('release_amp', this.value)"   
+                    ></webaudio-slider><webaudio-param link="release_amp" fontsize="9"></webaudio-param>
+                  </div>  
+
+                </div>
+              </div>
+          </div>
+        </div>
+        <!-- END Master Controls -->
+
+        <!-- OPERATOR B1 SECTION -->
+        <div class="synth-section">
+          <div class="section-title">Operator B1</div>
+
+            <div class="section-body"> 
+              <div class="knobs-col left-controls">
+                <!-- B1 KNOBS -->
+                <div class="control-wrapper">
+                  <span class="label">RATIO</span>
+                  <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
+                    id="ratio_B1" min="0.25" max="16.0" value="1" step="0.001" tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
+                    onchange="sendParam('ratio_B1', this.value)"
+                  ></webaudio-knob> <webaudio-param link="ratio_B1" fontsize="9"></webaudio-param>
+                </div>
+
+                <div class="control-wrapper">
+                  <span class="label">FEEDBACK</span>
+                  <webaudio-knob  src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
+                    id="feedback_B1" min="0" max="5" value="0" step="0.001" tooltip="Waveform shaper. Morph: Sine › Saw › Noise."
+                    onchange="sendParam('feedback_B1', this.value)"   
+                  ></webaudio-knob><webaudio-param link="feedback_B1" fontsize="9"></webaudio-param>
+                </div>
+
+                <div class="control-wrapper">
+                  <span class="label">MOD LEVEL</span>
+                  <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
+                    id="level_B1" min="0" max="10" value="0" step="0.001" tooltip="Modulation Depth"
+                    onchange="sendParam('level_B1', this.value)"
+                    ></webaudio-knob><webaudio-param link="level_B1" fontsize="9"></webaudio-param>
+                </div>
+
+              </div>
+              <!-- OPERATOR B1 adsr -->
+              <div class="adsr-col">
+                <div><canvas id="adsrCanvas_B1" class="adsrCanvas" width="160" height="90"></canvas>
+                </div>
+                <!-- adsr sliders -->
+                <div class="knobs-row adsr-sliders">
+                  
+                  <div class="control-wrapper">
+                    <span class="label">A</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="attack_B1" min="0" max="2000" value="0" step="0.1" tooltip="ATTACK B1 (ms)" direction="vert"
+                      onchange="sendParam('attack_B1', this.value)"   
+                    ></webaudio-slider><webaudio-param link="attack_B1" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">D</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="decay_B1" min="10" max="3000" value="200" step="0.1" tooltip="DECAY B1 (ms)" direction="vert"
+                      onchange="sendParam('decay_B1', this.value)"   
+                    ></webaudio-slider><webaudio-param link="decay_B1" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">S</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="sustain_B1" min="0" max="1" value="1" step="0.001" tooltip="SUSTAIN B1 (ms)" direction="vert"
+                      onchange="sendParam('sustain_B1', this.value)"   
+                    ></webaudio-slider><webaudio-param link="sustain_B1" fontsize="9"></webaudio-param>
+                  </div>
+
+                  <div class="control-wrapper">
+                    <span class="label">R</span>
+                    <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
+                      id="release_B1" min="10" max="2000" value="300" step="0.1" tooltip="RELEASE B1 (ms)" direction="vert"
+                      onchange="sendParam('release_B1', this.value)"   
+                    ></webaudio-slider><webaudio-param link="release_B1" fontsize="9"></webaudio-param>
+                  </div> 
+
+                </div>
+              </div>
+            </div>
+        </div>
+        <!-- END OP B1;   closed: "synth-section" -->
+
+        <!-- LFO 3 -->
+        <div class ="synth-section">
+          <div class="section-title">LFO 3</div>
+          <div class="knob-col">
+
+              <!-- dest -->
+              <div class="control-wrapper">
+                <span class="label">DESTINATION</span>
+                <div class="select-container">
+                  <select id="lfo3dest" onchange="sendLfoParam('dest', this.value, 3)">
+                    <option value="None">None</option><option value=0>Mix</option><option value=1>Volume</option><option value=2>A Ratio</option><option value=3>A Level</option><option value=4>A Feedback</option><option value=5>B1 Ratio</option><option value=6>B1 Level</option>
+                    <option value=7>B1 Feedback</option><option value=8>B2 Ratio</option><option value=9>B2 Level</option><option value=10>B2 Feedback</option><option value=11>C Ratio</option><option value=12>C Feedback</option>
+                  </select>
+                  <div class="select-arrow">▼</div>
+                </div>
+              </div>
+              
+              <!-- wave -->
+              <div class="control-wrapper">
+                <span class="label">WAVEFORM</span>
+                <div class="select-container">
+                  <select id="lfo3wave" onchange="sendLfoParam('wave', this.value, 3)">
+                    <option value=0>Sine</option><option value=1>Triangle</option><option value=2>Saw Up</option><option value=3>Saw Down</option><option value=4>Square</option>
+                  </select>
+                  <div class="select-arrow">▼</div>
+                </div>
+              </div>
+
+              <div class="control-wrapper">
+                <span class="label">AMOUNT</span>
+                <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                  id="lfo3amt" class="horizontal-slider" min="0" max="5" value="0.5" step="0.001" tooltip="LFO 3 MOD AMOUNT"direction="horz"
+                  width="100"
+                  onchange="sendLfoParam('amount', this.value, 3)"   
+                ></webaudio-slider><webaudio-param link="lfo3amt" fontsize="9"></webaudio-param>
+              </div>
+
+              <div class="control-wrapper">
+                <span class="label">RATE</span>
+                <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                  id="lfo3rate" class="horizontal-slider" min="0.01" max="20" value="1.0" step="0.001" tooltip="LFO 3 FREQUENCY" direction="horz"
+                  width="100"
+                  onchange="sendLfoParam('rate', this.value, 3)"   
+                ></webaudio-slider><webaudio-param link="lfo3rate" fontsize="9"></webaudio-param>
+              </div>
+
+              <div class="control-wrapper">
+                <span class="label">SMOOTHING</span>
+                <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                  id="lfo3smooth" class="horizontal-slider" min="0.0" max="1" value="0.0" step="0.001" tooltip="LFO 3 SMOOTHING" direction="horz"
+                  width="100"
+                  onchange="sendLfoParam('smooth', this.value, 3)"   
+                ></webaudio-slider><webaudio-param link="lfo3smooth" fontsize="9"></webaudio-param>
+              </div>
+            </div>
+        </div>
+
+        <!-- ENVELOPE -->
+        <div class ="synth-section">
+          <div class="section-title">Env</div>
+          <div class="knob-col">
+              <div><canvas id="envelopeCanvas" width="90" height="50"></canvas>
+                </div>
+              <!-- dest -->
+              <div class="control-wrapper">
+                <span class="label">DESTINATION</span>
+                <div class="select-container">
+                  <select id="envdest" onchange="sendEnvParam('dest', this.value)">
+                    <option value="None">None</option><option value=0>Mix</option><option value=1>Volume</option><option value=2>A Ratio</option><option value=3>A Level</option><option value=4>A Feedback</option><option value=5>B1 Ratio</option><option value=6>B1 Level</option>
+                    <option value=7>B1 Feedback</option><option value=8>B2 Ratio</option><option value=9>B2 Level</option><option value=10>B2 Feedback</option><option value=11>C Ratio</option><option value=12>C Feedback</option>
+                  </select>
+                  <div class="select-arrow">▼</div>
+                </div>
+              </div>
+
+              <div class="control-wrapper" style="margin-top:8px;">
+                <span class="label">AMOUNT</span>
+                <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                  id="envamt" class="horizontal-slider" min="-5.0" max="5" value="1.0" step="0.001" tooltip="ENVELOPE MOD AMOUNT" direction="horz"
+                  width="100"
+                  onchange="sendEnvParam('amount', this.value)"   
+                ></webaudio-slider><webaudio-param link="envamt" fontsize="9"></webaudio-param>
+              </div>
+
+              <div class="control-wrapper" style="margin-top:8px;">
+                <span class="label">RELEASE</span>
+                <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
+                  id="envrelease" class="horizontal-slider" min="0.001" max="2" value="0.1" step="0.001" tooltip="Envelope Release Time (s)" direction="horz"
+                  width="100"
+                  onchange="sendEnvParam('release', this.value)"   
+                ></webaudio-slider><webaudio-param link="envrelease" fontsize="9"></webaudio-param>
+              </div>
+          </div>
+        </div>
+
+        <!-- END synth-section-container   -  end second big synth row -->
+      </div>
+      <!-- END synth-section-container   -  end second big synth row -->
+
+
+      <!-- END RACK-MODULE -->
+    </div>
+<!-- SEQUENCER SECTION -->
+    <div class="synth-section">
+      <div class="section-title">SEQUENCER</div>
+      <div class="sequencer-controls">
+          <button id="playButton" class="synth-button" onclick="playSound()">play</button>
+
+          <div style="width:1px; height:20px; background:#444; margin:0 5px;"></div>
+
+          <div class="step-input-group">
+              <label for="octaveInput" style="font-size:0.7rem; color:#888;">OCT:</label>
+              <input type="number" 
+                    id="octaveInput" min="1" max="5" value="1" 
+                    onchange="updateOctave(this.value)">
+          </div>
+
+          <div class="step-input-group">
+              <label for="bpmInput" style="font-size:0.7rem; color:#888;">BPM:</label>
+              <input type="number" id="bpmInput" min="30" max="300" value="120" 
+                    onchange="updateBpm(this.value)">
+          </div>
+
+          <div class="step-input-group">
+              <label for="noteLengthSelect" style="font-size:0.7rem; color:#888;">Note Len:</label>
+              <select id="noteLengthSelect" onchange="updateNoteLength(this.value)" style="height: 28px; border-radius: 4px; border: 1px solid #ccc;">
+                  <option value="4">1/1</option>
+                  <option value="2">1/2</option>
+                  <option value="1"selected>1/4</option>
+                  <option value="1/2">1/8</option>
+                  <option value="1/4">1/16</option>
+                  <option value="3/4">1/3</option>
+                  <option value="3/8">1/6</option>
+                  <option value="3/16">1/9</option>
+              </select>
+          </div>
+
+          <div style="width:1px; height:20px; background:#444; margin:0 5px;"></div>
+
+          <button id="load-sequence" class="synth-button">Load Seq</button>
+          <button id="save-sequence" class="synth-button">Save Seq</button>
+          <button onclick="exportAudio(this)" style="background-color: #00ffcc; color: black; font-weight: bold;">Export WAV</button>
+      </div>
+      
+      
+      <div id="sequencerGrid" class="sequencer-wrapper">
+      </div>
+      <div class="sequencer-footer-controls">
+          <div class="footer-label">TRANSPOSE SEQ:</div>
+          <button class="footer-btn" onclick="transposeAll(-12)">-12</button>
+          <button class="footer-btn" onclick="transposeAll(-1)">-1</button>
+          <button class="footer-btn" onclick="transposeAll(1)">+1</button>
+          <button class="footer-btn" onclick="transposeAll(12)">+12</button>
+      </div>
+      
+    </div>
+
+    <script type="module">
+      import { 
+          handleSavePreset, handleLoadPreset, 
+          handleSaveSequence, handleLoadSequence
+      } from "/static/firebase/synth_bridge.js";
+      document.getElementById('load-sequence').onclick=handleLoadSequence
+      document.getElementById('save-sequence').onclick=handleSaveSequence
+      document.getElementById('load-synth-preset').onclick=handleLoadPreset
+      document.getElementById('save-synth-preset').onclick=handleSavePreset
+    </script>
+
+  
+    <script> // global function. used to update both internal values and GUI at the same time
+      function setValueAndChange(element_id, value) {
+        const el = document.getElementById(element_id);
+
+        if (!el) {
+          console.warn(`Elemento '${element_id}' non trovato.`);
+          return;
+        }
+
+        const isWebAudio = el.tagName.toLowerCase().startsWith('webaudio-');
+
+        // IMPOSTA IL VALORE E LA GRAFICA DELLA MANOPOLA
+        if (isWebAudio && typeof el.setValue === 'function') {
+            // false = non sparare eventi automatici, li gestiamo sotto
+            el.setValue(value, false); 
+        } else {
+            el.value = value;
+        }
+
+        // AGGIORNA IL DISPLAY (webaudio-param)
+        el.dispatchEvent(new Event('input'));
+
+        // AGGIORNA PYTHON (Server)
+        // Il backend ascolta l'evento 'change'.
+        el.dispatchEvent(new Event('change'));
+      }
+    </script>
+    <script src="/static/algo_images.js"></script>
+    <script src="/static/update_parameters.js"></script>
+    <script src="/static/sequencer.js"></script>
+    <script src="/static/draw_exp_envelope.js"></script>
+    <script src="/static/play_sound.js"></script>
+    <script src="/static/draw_adsr.js"></script>
+  </body>
+</html>
