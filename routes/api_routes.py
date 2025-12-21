@@ -111,7 +111,7 @@ def update_lfo_param():
         value = None if data.get('value')=="None" else float(data.get('value'))
 
         #value = float(data.get('value')) # Conversione in float
-        if param_name == 'dest' or param_name == 'wave': # conversione eccezionale in int
+        if param_name in ['dest', 'wave']: # conversione eccezionale in int
             value = None if value is None else int(value)
 
         index = int(data.get('lfoIndex'))

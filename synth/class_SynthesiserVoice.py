@@ -35,7 +35,7 @@ class SynthesiserVoice:
         try:
             self.modMatrix = ModMatrix(sample_rate=self._sr)
             self.modMatrix.initialize_modMatrix(self, self._sound)
-        except:
+        except Exception:
             print("Voice: unable to initialize ModMatrix")
 
             

@@ -81,7 +81,7 @@ Heavily inspired by the Elektron Digitone hardware synthesizer, it utilizes a cl
 
 ### Usage
 * **Play Sound**: Press the **Spacebar** to trigger a note immediately.
-* **Presets**: You can tweak parameters manually or load existing presets via the **"Load"** button in the "MASTER-CTRLS" section.
+* **Presets**: You can tweak parameters manually or load existing presets via the **"Load"** button in the "AMPLIFIER" section.
 * **Sequencer**: Scroll down to access the sequencer interface. You can load saved sequences using the specific **"Load"** button found in this section.
 * **Enjoy**: This is the most important step for using a synthesizer!
 
