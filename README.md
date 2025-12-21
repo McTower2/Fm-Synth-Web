@@ -39,7 +39,7 @@ Heavily inspired by the Elektron Digitone hardware synthesizer, it utilizes a cl
     2. Name it (e.g., "Synth-Client").
     3. Click "Register app".
     4. You will see a code block containing `const firebaseConfig = { ... };`. Keep this tab open or copy the content inside the curly braces `{...}`.
-    > if you accidentally leave this window, you will still have access to this data: from the project page click the settings icon on the top-left corner, click "project settings" and scroll down
+    > if you accidentally leave this window, you will still have access to this data: from the project page click the settings icon on the top-left corner (near "project overview"), click "project settings" and scroll down
 
     **C. Configure the Code**
     1. In your project folder on your computer, locate `firebase_config.example.js` (check `static/firebase/` folders).
