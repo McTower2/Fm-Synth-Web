@@ -1,6 +1,6 @@
 
 html {
-  font-size:25px;
+  font-size:24px;
   background-color: #1a1a1a; /* Sfondo pagina */
   font-family: 'Courier New', Courier, monospace;
   color: #ddd;
@@ -32,7 +32,7 @@ webaudio-param{
   display: flex;
   width: 100%;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-between;
 }
 /* 1. La sezione (es. Oscillatore, Filtro, LFO) */
 .synth-section {
