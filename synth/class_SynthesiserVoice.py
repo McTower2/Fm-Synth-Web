@@ -261,7 +261,7 @@ if __name__ == "__main__":
     voice.B2.setAdsrParams = (0.0, 50, 0.1, 500, 10) # b2
     voice._algo = 5
 
-    for i in range(sr*4):
+    for _ in range(sr*4):
         smp = voice.getNextSample()
         sig.append(smp)
         #if i == sr*2:
