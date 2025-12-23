@@ -3,39 +3,40 @@ from .class_Adsr import Adsr
 from math import pi
 
 class Operator:
+    """ FM Operator class. Composed of an FmFeedbackOsc and an Adsr, it outputs 2 signals:
+     -  audio signal of the oscillator (between -1 and 1)
+     -  control signal of the Adsr (between 'level' and 0)
+     +  note: the Adsr does not modulate the operator's amp"""
     def __init__(self, frequency=440.0, ratio=1.0, feedback=0.0, 
                  attack=100.0, decay=200.0, sustain=0.4, release=300.0, level=0.0, 
                  sample_rate=44100):
+        #constants
         self._sr = sample_rate
         self._sr_smp_to_ms = 1000/self._sr
         self._hz = 2*pi/self._sr
-
+        
+        # internal parameters
         self._ratio = ratio
         self._voice_freq = frequency
-        
         self._feedback = feedback
 
         # Oscillator init
-        self.oscillator = FmFeedbackOsc(freq=frequency * ratio,
-                                        feedback=feedback,
-                                        sample_rate=self._sr)
-        
+        self.oscillator = FmFeedbackOsc(freq=frequency * ratio, feedback=feedback, sample_rate=self._sr)
+        # Adsr init
         self.adsr = Adsr(attack, decay, sustain, release, level)
         self._update_frequency()
 
-    #Oscillator
     def _update_frequency(self):
-        """updated internal frequency based on self.frequency and self.ratio"""
-        self._operator_freq = self._voice_freq * self._ratio
-        self.oscillator.setFrequency(self._operator_freq)
+        """update internal frequency based on frequency and ratio"""
+        self._operator_freq = self._voice_freq * self._ratio # update internal state
+        self.oscillator.setFrequency(self._operator_freq) # update oscillator's state
 
-    #Operator
     def getFreq(self):
-        """returns general frequency (real operator_freq is rescaled by ratio)"""
+        """returns the voice frequency (ignoring ratio)"""
         return self._voice_freq
 
     def setFreq(self, value):
-        """set voice frequency (ratio will rescale this value)"""
+        """set voice frequency (ratio also influences this value)"""
         self._voice_freq = value
         self._update_frequency()
 
@@ -63,19 +64,19 @@ class Operator:
         return value_in_samples * self._sr_smp_to_ms
 
     def getAttack(self):
-        """returns ADSR attack time in ms"""
+        """returns ADSR attack (time in ms)"""
         return self._smpToMs(self.adsr.getAttack())
 
     def setAttack(self, value):
-        """sets ADSR attack time in ms"""
+        """sets ADSR attack (time in ms)"""
         self.adsr.setAttack(value)
 
     def getDecay(self):
-        """returns ADSR decay time in ms"""
+        """returns ADSR decay (time in ms)"""
         return self._smpToMs(self.adsr.getDecay())
 
     def setDecay(self, value):
-        """sets ADSR decay time in ms"""
+        """sets ADSR decay (time in ms)"""
         self.adsr.setDecay(value)
 
     def getSustain(self):
@@ -119,7 +120,7 @@ class Operator:
         self.oscillator.setFeedback(self._feedback)
 
     def setAdsrParams(self, params:tuple[float]):
-        """set level Adsr parameters. expects: (a, d, s, r, lev). each one of them can be None"""
+        """set level Adsr parameters. expects: (a, d, s, r, level). each one of them can be None"""
         attack, decay, sustain, release, lev = params
         if attack is not None: self._attack = attack
         if decay is not None: self._decay = decay
@@ -130,7 +131,7 @@ class Operator:
 
     # linkers to subclasses
     def setGate(self, gate: bool, numSamples: int = None):
-        """ set the Adsr gate. optional: for a given number of samples """
+        """ set the Adsr gate. (optional: for a given number of samples) """
         self.adsr.setGate(gate, numSamples)
     
     def resetPhase(self):
@@ -139,7 +140,7 @@ class Operator:
 
     # dsp methods
     def noteOn(self, frequency, gate=True, numSamples=None):
-      """set audio frequency and start level adsr"""
+      """updates frequency and start level ADSR (Fm amount)"""
       self.adsr.setGate(gate, numSamples)
       self.freq = frequency
 

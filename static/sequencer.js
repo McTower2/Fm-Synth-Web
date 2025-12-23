@@ -1,7 +1,12 @@
 const MAX_STEPS = 64;       
 const MAX_POLYPHONY = 6;    
 const VISIBLE_OCTAVES = 3;
+const SCROLL_THRESHOLD = 30;
+let scrollAccumulator = 0;
+const gridContainer = document.getElementById('sequencerGrid');
 
+
+// MODEL
 let baseOctave = parseInt(document.getElementById('octaveInput').value); 
 let bpm = parseInt(document.getElementById('bpmInput').value);
 let note_type = eval(document.getElementById('noteLengthSelect').value);
@@ -9,7 +14,7 @@ let step_len = 60/bpm*note_type;
 
 let sequencer_status = new Array(MAX_STEPS).fill(null);
 
-// ================= FUNZIONI DI CONTROLLO =================
+// CONTROL  
 function updateOctave(newVal) {
     const el = document.getElementById('octaveInput');
     baseOctave = Math.max(el.min, Math.min(el.max, parseInt(newVal) || el.min))
@@ -31,13 +36,13 @@ function updateNoteLength(newVal){
     console.log("Nuovo note lenght impostato a:", newVal);
 }
 
-// ================= RENDERING CORE =================
+// VIEW
 
 function render() {
     const container = document.getElementById('sequencerGrid');
     container.innerHTML = ''; 
 
-    // Calcoliamo il range MIDI
+    // MIDI range
     const startMidi = baseOctave * 12; 
     const endMidi = startMidi + (VISIBLE_OCTAVES * 12) - 1;
 
@@ -48,23 +53,23 @@ function render() {
     createTimeline(container);
 }
 
+// numbered measures
 function createTimeline(container) {
     const row = document.createElement('div');
     row.className = 'timeline-row';
 
-    // Spaziatore sinistro (sotto la colonna dei tasti piano)
+    // Left space for piano keys
     const spacer = document.createElement('div');
     spacer.className = 'timeline-key-spacer';
     row.appendChild(spacer);
 
-    // Celle numerate
+    // Numbered cells
     for (let step = 0; step < MAX_STEPS; step++) {
         const cell = document.createElement('div');
         cell.className = 'timeline-cell';
         
-        // Ogni 4 step (0, 4, 8...) mettiamo il numero della battuta
+        // Measure number every 4 steps
         if (step % 4 === 0) {
-            // Calcolo matematico: step 0 -> Battuta 1, step 4 -> Battuta 2
             const measureNumber = (step / 4) + 1;
             cell.innerText = measureNumber;
             cell.classList.add('measure-start');
@@ -76,36 +81,37 @@ function createTimeline(container) {
     container.appendChild(row);
 }
 
+// Grid
 function createRow(midiNote, container) {
     const row = document.createElement('div');
     row.className = 'seq-row';
 
-    // Tasto Piano (Colonna SX)
+    // Piano keys on the left
     const noteIndex = midiNote % 12;
     const isBlackKey = [1, 3, 6, 8, 10].includes(noteIndex);
     
     const keyDiv = document.createElement('div');
     keyDiv.className = 'piano-key ' + (isBlackKey ? 'key-black' : 'key-white');
     
-    if (noteIndex === 0) { // Scrivi C3, C4 ecc. solo sui DO
+    if (noteIndex === 0) { // write C-Octave
         const oct = Math.floor(midiNote / 12);
         keyDiv.innerText = "C" + oct;
     }
     row.appendChild(keyDiv);
 
-    // Celle Steps (Colonne DX)
+    // Cell Steps
     const bgClass = isBlackKey ? 'row-bg-black' : 'row-bg-white';
 
     for (let step = 0; step < MAX_STEPS; step++) {
         const cell = document.createElement('div');
         cell.className = `step-cell ${bgClass}`;
         
-        // Controllo se la nota è attiva
+        // if active note
         const stepData = sequencer_status[step];
         if (stepData && stepData.includes(midiNote)) {
             cell.classList.add('active');
         }
-        // Aggiungiamo interazione
+        // define interaction
         cell.onclick = () => toggleNote(step, midiNote);
 
         row.appendChild(cell);
@@ -114,10 +120,9 @@ function createRow(midiNote, container) {
     container.appendChild(row);
 }
 
-// ================= LOGICA NOTE =================
-
+// Control
 function toggleNote(step, midiNote) {
-    // Inizializza array se era null
+    // init sequencer status
     if (sequencer_status[step] === null) {
         sequencer_status[step] = [];
     }
@@ -126,13 +131,13 @@ function toggleNote(step, midiNote) {
     const index = currentStepNotes.indexOf(midiNote);
 
     if (index > -1) {
-        // A) RIMUOVI NOTA ESISTENTE
+        // A) remove existing note
         currentStepNotes.splice(index, 1);
         if (currentStepNotes.length === 0) {
             sequencer_status[step] = null;
         }
     } else {
-        // B) AGGIUNGI NUOVA NOTA (Con limite Max Polyphony)
+        // B) add new note 
         if (currentStepNotes.length >= MAX_POLYPHONY) {
             console.warn(`Max polyphony reached (${MAX_POLYPHONY} notes) for step ${step+1}`);
             return; 
@@ -144,12 +149,7 @@ function toggleNote(step, midiNote) {
     render();
 }
 
-// ================= EVENT LISTENER SCROLL =================
-const gridContainer = document.getElementById('sequencerGrid');
-
-let scrollAccumulator = 0;
-const SCROLL_THRESHOLD = 30; // sensibilità dello scroll verticale sulle ottave
-
+// EVENT LISTENER SCROLL
 gridContainer.addEventListener('wheel', (evt) => {
     // 1. Blocchiamo sempre lo scroll di default della pagina
     evt.preventDefault(); 
@@ -180,24 +180,23 @@ gridContainer.addEventListener('wheel', (evt) => {
 
 // ================= TRANSPOSE FUNCTION =================
 /**
- * Sposta tutte le note della sequenza di n semitoni.
- * @param {number} semitones - Esempio: 1 (su), -1 (giù), 12 (ottava su)
- */
+* @param {number} semitones
+*/
 function transposeAll(semitones) {
-    let noteChanged = false; // Per sapere se dobbiamo ridisegnare
+    let noteChanged = false; // must redraw or not
 
-    // Cicla attraverso tutti gli step (da 0 a 63)
+    // cycle on the steps
     for (let i = 0; i < sequencer_status.length; i++) {
         let stepNotes = sequencer_status[i];
 
-        // Se lo step contiene note
+        // if contains notes
         if (stepNotes && stepNotes.length > 0) {
-            // Mappa le note correnti ai nuovi valori
-            // Es: [36, 40] + 1 diventa [37, 41]
             sequencer_status[i] = stepNotes.map(note => {
                 let newNote = note + semitones;
-                if (newNote < 12) newNote = 12;
-                if (newNote > 95) newNote = 95;
+                const floor = 12;
+                const Ceiling = 95;
+                if (newNote < floor) newNote = floor;
+                if (newNote > Ceiling) newNote = Ceiling;
                 
                 return newNote;
             });
@@ -206,12 +205,12 @@ function transposeAll(semitones) {
     }
 
     if (noteChanged) {
-        render(); // Ridisegna la griglia con le nuove posizioni
+        render(); // redraw
     }
 }
 
 // --- INIT ---
-// Dati di default
+// Default data
 sequencer_status[0] = [36]; // C3
 
 render();
@@ -224,20 +223,19 @@ render();
 
 
 
-// --- AGGIUNTE PER FIREBASE ---
+// --- FIREBASE ---
 
+// save sequence
 window.getSequencerState = function() {
     return {
-        // L'array delle note
         sequence: sequencer_status, 
-        
-        // Variabili singole
         baseOctave: baseOctave,
         bpm: bpm,
         note_type: document.getElementById('noteLengthSelect').value,
     };
 };
 
+// load sequence
 window.applySequencerState = function(data) {
     console.log("Applicazione sequenza:", data);
 

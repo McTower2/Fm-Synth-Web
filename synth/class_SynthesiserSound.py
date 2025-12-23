@@ -1,6 +1,3 @@
-"""
-Qui ci stanno i parametri statici del mio synth. ogni synthVoice legge i parametri da qua a ogni noteOn per generare il suono
-"""
 from dataclasses import dataclass
 
 @dataclass
@@ -14,6 +11,13 @@ class LfoParams:
 
 @dataclass
 class SynthesiserSound:
+    """ Synthesiser official parameters container.
+     stores parameters for:
+      * operators: (ratio, feedback)
+      * Adsr envelopes: (a,d,s,r,level)
+      * LFOs: (destination, frequency, waveform, smooth)
+      * exponential envelope: (release, amount)
+      * ModMatrix: (destination, amount) """
     def __init__(self, masterVolume = 1,
                  algorithm:int=1, mix=0.5, 
                  
@@ -182,7 +186,7 @@ class SynthesiserSound:
         return self._mix
     def setMix(self, mix: float):
         """set operator X-Y mix"""
-        self._mix = max(min(mix, 1), 0) # clampato tra 0 e 1
+        self._mix = max(min(mix, 1), 0)
 
 # AMP 
     def getAttackAmp(self): return self._attack_amp
@@ -207,7 +211,7 @@ class SynthesiserSound:
 
     def getAmp(self): return self._amp
     def setAmp(self, amp: float):
-        """set overall output amplitude"""
+        """ max Amplitude of the voice """
         self._amp = min(max(0.0, amp), 1)
 
 # Op A
@@ -317,14 +321,16 @@ class SynthesiserSound:
         >>> frequency : float,
         >>> waveform : int,
         >>> smooth : float\n
-        ```
         \ndestinations:
+        ```
         - "mix", "amp"
         - "a ratio",  "a fb",  "a lev"
         - "b1 ratio", "b1 fb", "b1 lev"
         - "b2 ratio", "b2 fb", "b2 lev"
         - "c ratio",  "c fb"
+        ```
         waveforms:
+        ```
         - sine: 0
         - triangle: 1
         - saw up: 2
@@ -332,10 +338,11 @@ class SynthesiserSound:
         - square: 4
         ```
         """
-        def convert_destination(dest):
+        def convert_destination(dest: str) -> int:
+            """ converts mod destination from string to integer """
             if isinstance(dest, str):
                 if dest not in self.lfoDestinationConverter.keys():
-                    raise ValueError(f"SynthesiserSound: LFO destination '{dest}' not valid.")
+                    raise ValueError(f"SynthesiserSound: destination '{dest}' not valid.")
                 return self.lfoDestinationConverter[dest]
             return dest
         
@@ -388,11 +395,10 @@ class SynthesiserSound:
         return self.envRelease
 
     def setEnvDestination(self, destination):
-        """value of type None | int"""
+        """destination of type None | int"""
         self.envDestination = destination
     def getEnvDestination(self):
         return self.envDestination
-#End!!!
 
     # @staticmethod
     # def printAlgorithms():

@@ -1,7 +1,7 @@
 
 html {
   font-size:24px;
-  background-color: #1a1a1a; /* Sfondo pagina */
+  background-color: #1a1a1a;
   font-family: 'Courier New', Courier, monospace;
   color: #ddd;
 }
@@ -13,7 +13,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh; /* Assicura che riempia almeno lo schermo */
+  min-height: 100vh;
 }
 
 h1{
@@ -27,27 +27,23 @@ h1{
 webaudio-param{
   margin-top:0.1rem;
 }
-/* ------------------- LAYOUT DEL SYNTH --------------------------------------------- */
+/* ------------------- LAYOUT SYNTH --------------------------------------------- */
 .synth-section-container{
   display: flex;
   width: 100%;
   flex-wrap: wrap;
   justify-content: space-between;
 }
-/* 1. La sezione (es. Oscillatore, Filtro, LFO) */
 .synth-section {
-  display: flex;        /* Attiva il layout flessibile */
-  flex-direction: column; /* Gli elementi interni (titolo, manopole) vanno dall'alto in basso */
-  align-items: center;    /* Centra tutto orizzontalmente */
+  display: flex;        
+  flex-direction: column; 
+  align-items: center;
   
-  background-color: #252525; /* Leggermente diverso dal fondo */
-  border: 0.2rem solid #444; /* Bordo della sezione */
+  background-color: #252525; 
+  border: 0.2rem solid #444; 
   border-radius: 0.5rem;
   padding: 0.3rem;
-  /* Se ho più sezioni, voglio che si distanzino */
   margin: 0.2rem;
-  /* Flex-grow: 1 significa "se c'è spazio vuoto, allargati per riempirlo" */
-  /* flex-grow: 1;  */
 }
 
 .section-title {
@@ -62,41 +58,40 @@ webaudio-param{
 
 .section-body {
   display: flex;
-  flex-direction: row; /* Affiancati orizzontalmente */
-  align-items: flex-start; /* Allineati in alto */
-  gap: 1rem; /* Spazio tra colonna knob e colonna adsr */
+  flex-direction: row; 
+  align-items: flex-start; 
+  gap: 1rem; 
   width: 100%;
 }
 
-/* 2. Il contenitore delle manopole dentro una sezione */
 .knobs-row {
-  display: flex;          /* Mette le manopole in fila orizzontale */
+  display: flex;   
   flex-direction: row;
-  justify-content: center; /* Le centra nella sezione */
-  flex-wrap: wrap;        /* Se non ci stanno, vanno a capo da sole! */
-  gap: 1.5rem;            /* Spazio automatico tra le manopole */
+  justify-content: center; 
+  flex-wrap: wrap;
+  gap: 1.5rem; 
 }
 
 .knobs-col {
-  display: flex;          /* Mette le manopole in fila orizzontale */
+  display: flex;        
   flex-direction: column;
-  justify-content: center; /* Le centra nella sezione */
-  flex-wrap: wrap;        /* Se non ci stanno, vanno a capo da sole! */
-  gap: 0.2rem;            /* Spazio automatico tra le manopole */
-}
-
-/* Colonna Sinistra di ogni operatore (Knobs verticali) */
-.left-controls {
-  /* flex-direction:column; */
   justify-content: space-around;
-  height: 100%; /* Distribuisce bene verticalmente */
-  flex-shrink: 0; /* Impedisce che si schiacci */
+  height:100%;
+  flex-wrap: wrap;
+  gap: 0.2rem;
 }
 
-/* Colonna Destra (Canvas + Sliders) */
+/* (vertical Knobs) */
+.left-controls {
+  justify-content: space-around;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+/* (Canvas + Sliders) */
 .adsr-col {
   display: flex;
-  flex-direction: column; /* Canvas sopra, Slider sotto */
+  flex-direction: column;
   align-items: center;
   flex-grow: 1;
   gap: 0.2rem;
@@ -113,12 +108,12 @@ webaudio-param{
 }
 
 .adsr-sliders {
-  gap: 0.8rem; /* Riduciamo il gap orizzontale tra slider per compattezza */
+  gap: 0.8rem; 
   margin-top: 0.1rem;
 }
 
 
-/* 3. Il singolo controllo (Manopola + Etichetta) */
+/* parameter (knob + label) */
 .control-wrapper {
   margin:0;
   display: flex;
@@ -159,19 +154,18 @@ webaudio-param{
 .algorithm-display img {
     max-width: 100%;
     max-height: 100%;
-    object-fit: contain; /* Mantiene le proporzioni senza deformare */
+    object-fit: contain;
     display: block;
 }
 
 #envelopeCanvas {
-    background-color: #222; /* Sfondo leggermente più chiaro del body */
+    background-color: #222; 
     border: 2px solid #333;
     border-radius: 6px;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.5); /* Ombra interna per profondità */
-    /* Dimensioni fisse per il disegno, ma flessibili nel layout */
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5); 
     width: 3.6rem; 
     height: 50px;
-    margin-bottom: 15px; /* Spazio sopra il div destination */
+    margin-bottom: 15px;
 }
 
 /* ---------- LFO dropdown menu ---------------------- */
@@ -183,22 +177,22 @@ webaudio-param{
 
 .select-container select {
   width: 100%;
-  appearance: none; /* RIMUOVE LO STILE NATIVO DEL BROWSER (importante!) */
+  appearance: none; 
   -webkit-appearance: none;
   -moz-appearance: none;
   
   background-color: #111;
-  color: #00ff88; /* Testo verde neon */
-  font-family: 'Courier New', monospace; /* Font stile display */
+  color: #00ff88; 
+  font-family: 'Courier New', monospace;
   font-size: 0.6rem;
   
   border: 1px solid #444;
   border-radius: 4px;
   padding: 4px;
-  padding-right: 25px; /* Spazio per la freccia */
+  padding-right: 25px;
   cursor: pointer;
   
-  box-shadow: inset 0 2px 5px rgba(0,0,0,0.8); /* Effetto incassato "schermo" */
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
 }
 
 .select-container select:focus {
@@ -207,7 +201,7 @@ webaudio-param{
   box-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
 }
 
-/* La freccetta custom */
+/* custom arrow */
 .select-arrow {
   position: absolute;
   top: 50%;
@@ -215,10 +209,9 @@ webaudio-param{
   transform: translateY(-50%);
   color: #666;
   font-size: 0.6rem;
-  pointer-events: none; /* Il click passa attraverso e colpisce la select */
+  pointer-events: none;
 }
 
-/* Opzioni del menu */
 .select-container option {
   background-color: #222;
   color: #ddd;
@@ -227,20 +220,19 @@ webaudio-param{
 /*---------- sequencer ---------------*/
 
 :root {
-    --bg-color: #1a1a1a;
-    --white-key-row: #2a2a2a;
+    --bg-color: #1a1a1a; /* piano white key */
+    --white-key-row: #2a2a2a; /* piano black key */
     --black-key-row: #1f1f1f;
     --grid-line: #333;
-    --neon-accent: #00ffcc; /* Verde Ciano */
-    --neon-warn: #ffcc00;   /* Giallo per limiti */
+    --neon-accent: #00ffcc;
     --key-white: #ddd;
     --key-black: #444;
-    --cell-active: #00ffcc;
-    --cell-inactive: #111; /* Colore per step disattivati */
+    --cell-active: #00ffcc; /* active step */
+    --cell-inactive: #111; /* inactive step */
     --text-color: #ccc;
 }
 
-/* --- CONTROLLI --- */
+/* --- CONTROLS (Sequencer) --- */
 .sequencer-controls {
     border: 2px solid #444;
     border-bottom: none;
@@ -250,12 +242,11 @@ webaudio-param{
     display: flex;
     gap: 0.5rem;
     align-items: center;
-    flex-wrap: wrap; /* Per gestire schermi piccoli */
+    flex-wrap: wrap;
     justify-content: center;
     width: 100%;
 }
 
-/* Stile pulsanti generico */
 button, .synth-button {
     background: #333;
     border: 1px solid #555;
@@ -270,7 +261,6 @@ button, .synth-button {
 button:hover { background: #444; border-color: #777; }
 button:active { background: #222; }
 
-/* Pulsante PLAY speciale */
 #playButton {
     border-color: var(--neon-accent);
     color: var(--neon-accent);
@@ -281,7 +271,7 @@ button:active { background: #222; }
     box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
 }
 
-/* Input numerico per gli Step */
+/* Octave, Bpm, Note len */
 .step-input-group {
     display: flex;
     align-items: center;
@@ -310,34 +300,30 @@ input[type=number]:focus { outline: none; }
     flex-direction: column;
     border: 2px solid #444;
     background: #000;
-    max-height: 70vh; /* Ridotto leggermente per evitare che occupi troppo schermo */
+    max-height: 70vh;
     min-height: 30vh;
     max-width:40rem;
-    
-    /* MODIFICA: Abilitiamo lo scroll in entrambe le direzioni */
+
     overflow-y: auto; 
     overflow-x: auto; 
     
     position: relative;
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
     
-    /* Importante per lo scroll fluido */
     white-space: nowrap;
 }
 
 .seq-row {
     display: grid;
-    /* FONDAMENTALE: Deve essere 64, come nel Javascript */
-    grid-template-columns: 60px repeat(64, 55px); 
+    grid-template-columns: 60px repeat(64, 55px); /* must be 64 exactly like in javascript! */
     
-    /* Questo assicura che la riga si allarghi per contenere tutto */
     width: max-content; 
     
     height: 25px;
     border-bottom: 1px solid var(--grid-line);
 }
 
-/* --- TASTI PIANOFORTE --- */
+/* --- PIANO KEYS --- */
 .piano-key {
     position: sticky;
     left: 0;
@@ -349,13 +335,12 @@ input[type=number]:focus { outline: none; }
     padding-right: 5px;
     color: #000;
     box-sizing: border-box;
-    /* Ombra per staccarlo visivamente mentre scorri orizzontalmente */
     box-shadow: 2px 0 5px rgba(0,0,0,0.5);
 }
 .key-white { background-color: var(--key-white); color: #333; }
 .key-black { background-color: var(--key-black); color: #eee; border-bottom: 1px solid #333; }
 
-/* --- GRIGLIA CELLE --- */
+/* --- CELLS GRID --- */
 .step-cell {
     border-right: 1px solid var(--grid-line);
     cursor: pointer;
@@ -369,14 +354,13 @@ input[type=number]:focus { outline: none; }
 .row-bg-white { background-color: var(--white-key-row); }
 .row-bg-black { background-color: var(--black-key-row); }
 
-/* NOTA ATTIVA */
 .step-cell.active {
     background-color: var(--cell-active);
     box-shadow: 0 0 8px var(--cell-active);
     border-color: var(--cell-active);
 }
 
-/* Marker battuta (ogni 4) */
+/* marker Musical Measure (4 steps) */
 .step-cell:nth-child(4n + 1) { border-right: 1px solid #666; }
 
 select {
@@ -400,43 +384,38 @@ select {
 /* --------- TIMELINE SEQUENCER --------------*/
 .timeline-row {
     display: grid;
-    /* FONDAMENTALE: Deve essere identico a .seq-row per allinearsi */
-    grid-template-columns: 60px repeat(64, 55px); 
-    height: 20px;            /* Più sottile delle righe normali */
-    background-color: #111;  /* Sfondo scuro */
+    grid-template-columns: 60px repeat(64, 55px);  /* must be identical to .seq-row to be alligned */
+    height: 20px;            
+    background-color: #111;  
     border-top: 2px solid #444;
     
-    /* STICKY MAGIC: Rimane incollato al fondo del contenitore */
     position: sticky;
     bottom: 0;
-    z-index: 20; /* Sopra le celle normali, ma sotto i tasti del piano se si incrociano */
+    z-index: 20; 
 }
 
-/* Lo spaziatore a sinistra (sotto i tasti del piano) */
 .timeline-key-spacer {
     position: sticky;
     left: 0;
     background-color: #111;
-    z-index: 25; /* Deve coprire lo scorrimento */
+    z-index: 25; 
     border-right: 2px solid #555;
 }
 
-/* La singola cella col numero */
 .timeline-cell {
     display: flex;
-    align-items: center;     /* Centra verticalmente */
-    padding-left: 5px;       /* Spazio dal bordo sinistro */
+    align-items: center;  
+    padding-left: 5px;    
     
     font-size: 15px;
     color: #666;
-    border-right: 1px solid #222; /* Separatore quasi invisibile */
+    border-right: 1px solid #222; 
 }
 
-/* Stile per la cella che ha effettivamente il numero (ogni 4) */
 .timeline-cell.measure-start {
-    color: #00ffcc;          /* Colore evidente (il tuo verde acqua) */
+    color: #00ffcc;        
     font-weight: bold;
-    border-left: 1px solid #555; /* Segna l'inizio battuta */
+    border-left: 1px solid #555; 
     background: linear-gradient(to right, #222, transparent);
 }
 
@@ -445,7 +424,7 @@ select {
 .sequencer-footer-controls {
     display: flex;
     align-items: center;
-    justify-content: center; /* Centrati al centro */
+    justify-content: center;
     gap: 10px;
     padding: 10px;
     border: 2px solid #444;

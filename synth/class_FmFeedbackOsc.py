@@ -28,21 +28,20 @@ class FmFeedbackOsc:
 
     def getCurrentSample(self, phase_mod_input=0.0):
         """
-        Restituisce il campione corrente.
-        phase_mod_input: modulazione esterna in radianti (NON persistente)
+        Returns current sample.
+        phase_mod_input: external modulation source (Phase Modulation)
         """
-        # Calcolo Feedback
+        # read Feedback
         fb_in = 0.5 * (self._old0 + self._old1)
         internal_mod = fb_in * self._feedback
-
+        # calculate audio sample
         total_phase = self._phase + internal_mod + phase_mod_input
-        
         sample = sin(total_phase)
         return sample
 
     def getNextSample(self, phase_mod_input=0.0):
         """
-        Restituisce il campione e avanza la fase.
+        Returns next sample and updates internal state
         """
         sample = self.getCurrentSample(phase_mod_input)
         
@@ -50,7 +49,7 @@ class FmFeedbackOsc:
         self._old1 = self._old0
         self._old0 = sample
         
-        # Avanzamento fase (solo frequenza base, la modulazione non si accumula!)
+        # Update internal phase
         self._phase += self._freqRad
         if self._phase >= self._twoPi: 
             self._phase -= self._twoPi

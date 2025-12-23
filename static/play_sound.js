@@ -1,5 +1,5 @@
 const playButton = document.getElementById('playButton');
-// Creiamo un singolo elemento Audio da riutilizzare
+const DOWNLOAD_FILE_NAME = 'my_sequence.wav'
 const audio = new Audio();
 
 async function playSound() {
@@ -9,19 +9,18 @@ async function playSound() {
 
     let slicedGrid = sequencer_status.slice(0); 
 
-    // PULIZIA E OFFSET
-    const OCTAVE_OFFSET = 12; // 1 ottava
+    // CLEANING AND OFFSET
+    const OCTAVE_OFFSET = 12; // 1 Octave
     slicedGrid = slicedGrid.map(step => {
         if (!step || step.length === 0) return null;
         return step.map(noteNumber => noteNumber + OCTAVE_OFFSET)
     });
     
-    // RIMOZIONE NULL FINALI
+    // Remove null from the end of the sequence
     while (slicedGrid.length > 0 && slicedGrid[slicedGrid.length - 1] === null) {
         slicedGrid.pop();
     }
 
-    // payload
     const payload = {
         grid: slicedGrid,       
         step_len: parseFloat(step_len) 
@@ -35,62 +34,55 @@ async function playSound() {
     try {
         await audio.play();
     } catch (e) {
-        console.error("Errore riproduzione:", e);
+        console.error("Playback Error:", e);
         resetButtonState(); 
         playButton.textContent = 'Error';
     }
 }
 
-// === GESTIONE STOP ===
-
+// STOP SOUND
 function stopSound() {
     audio.pause();
     audio.currentTime = 0;
     resetButtonState();
 }
 
-// Funzione helper per riportare il bottone allo stato iniziale
+// reset play button
 function resetButtonState() {
     playButton.disabled = false;
     playButton.textContent = 'Play!';
-    playButton.onclick = playSound; // Riassegniamo la funzione di Play
+    playButton.onclick = playSound;
 }
 
-// === EVENTI AUDIO ===
-
-// Quando l'audio è effettivamente partito (dopo il caricamento)
+// AUDIO EVENTS 
 audio.onplaying = () => {
     playButton.disabled = false;
     playButton.textContent = 'Stop';
     playButton.onclick = stopSound; 
 };
 
-// Quando l'audio finisce naturalmente
 audio.onended = () => {
     resetButtonState();
 };
 
-// === SHORTCUT TASTIERA ===
-
+// KEYBOARD SHORTCUT
 document.addEventListener('keydown', function(e) {
     if (e.code === 'Space') {
         
-        // Ignora se l'utente scrive in un input
+        // If user is writing, ignore
         if (document.activeElement.tagName === 'INPUT') return;
 
-        // Previeni lo scroll
+        // prevent default scroll
         e.preventDefault();
 
-        // Se il bottone è disabilitato (sta caricando), ignora
+        // ignore if audio is loading
         if (playButton.disabled) return;
 
         if (!e.repeat) {
-            // LOGICA TOGGLE:
-            // Se l'audio non è in pausa e non è finito -> STOP
+            // TOGGLE:
             if (!audio.paused && !audio.ended && audio.currentTime > 0) {
                 stopSound();
             } else {
-                // Altrimenti -> PLAY
                 playSound();
             }
         }
@@ -98,13 +90,13 @@ document.addEventListener('keydown', function(e) {
 });
 
 
-// LOGICA PER EXPORT WAV
+// EXPORT WAV
 async function exportAudio(btn) {
-    if (!confirm("Do you really want to download the WAV file?")) {
+    if (!confirm("Do you really wish to download the WAV file?")) {
         return;
     }
 
-    // DISABILITA IL BOTTONE
+    // DISABLE BUTTON
     const originalText = btn.innerText;
     btn.disabled = true;
     btn.innerText = "Processing...";
@@ -133,7 +125,7 @@ async function exportAudio(btn) {
 
         const downloadUrl = `/audio?t=${new Date().getTime()}&data=${encodedData}&export=true`;
 
-        // aspetta la risposta di flask
+        // wait for flask response
         const response = await fetch(downloadUrl);
 
         if (!response.ok) {
@@ -142,15 +134,15 @@ async function exportAudio(btn) {
 
         const blob = await response.blob();
 
-        // Crea un URL temporaneo per il blob che risiede nella memoria del browser
+        // create temporary space for the binary file
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'my_sequence.wav'; // Nome del file
+        link.download = DOWNLOAD_FILE_NAME;
         document.body.appendChild(link);
         link.click();
         
-        // Pulizia
+        // Clean
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
 
@@ -158,7 +150,7 @@ async function exportAudio(btn) {
         console.error("Export failed:", error);
         alert("An error occurred during the export of the audio file.");
     } finally {
-        // RIABILITA IL BOTTONE
+        // REACTIVATE BUTTON
         btn.disabled = false;
         btn.innerText = originalText;
         btn.style.cursor = "default";

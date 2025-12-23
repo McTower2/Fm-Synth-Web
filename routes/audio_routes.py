@@ -1,4 +1,4 @@
-# genera l'audio da mandare a javascript
+# generate audio and send to js
 from flask import Blueprint, send_file, current_app, request
 import io
 import wave
@@ -12,18 +12,17 @@ SAMPLERATE = 44100
 @audio_bp.route('/audio')
 def generate_audio():
     data_str = request.args.get('data')
-    # Controlliamo se è un export (trasformiamo la stringa 'true' in booleano)
+    # check if it's an export request
     is_export = request.args.get('export') == 'true' 
     
     if data_str:
         try:
-            # RICEZIONE E PULIZIA DATI GREZZI
+            # clean data
             frontend_data = json.loads(data_str)
-            
             raw_grid = frontend_data.get('grid', []) 
             step_len = float(frontend_data.get('step_len', 0.5)) 
             
-            # 2. TRASFORMAZIONE: Liste -> Tuple
+            # conversion. List -> Tuple
             processed_grid = []
             
             for step in raw_grid:
@@ -33,28 +32,27 @@ def generate_audio():
                     processed_grid.append(tuple(step))
             
             # DEBUG PRINT
-            print(f"Grid elaborata: {processed_grid}")
+            print(f"processed grid: {processed_grid}")
             print(f"Step Length: {step_len}")
-            # print(f"Export Mode: {is_export}") # Debug per vedere se l'export è attivo
 
-            # GENERAZIONE E INVIO AUDIO
+            # SOUND GENERATION
             try:
                 synth = current_app.synth
             except AttributeError:
-                print("ERRORE: Impossibile trovare 'app.synth'.")
+                print("ERRORE: Unable to connect to app.synth.")
                 return "Errore server", 500
             
-            # inizializza la fase degli operatori e degli lfo
+            # reset phase at the beginning for coherence
             synth.resetPhases()
             synth.resetLfoPhases()
 
-            # Generazione segnale
+            # Sound generation
             sig = synth.sequencer.create_sequence(processed_grid, step_len)
             
-            # --- Conversione in WAV ---
+            # wav conversion
             memory_file = io.BytesIO()
             
-            # Gestione mono/stereo
+            # mono/stereo
             if sig.ndim == 1: n_channels = 1
             elif sig.ndim == 2: n_channels = sig.shape[1]
             else: n_channels = 1 
@@ -71,17 +69,15 @@ def generate_audio():
             
             memory_file.seek(0)
 
-            # --- MODIFICA QUI: GESTIONE EXPORT VS PLAY ---
+            # EXPORT VS PLAY
             if is_export:
-                # Se è un export, forza il download del file
                 return send_file(
                     memory_file, 
                     mimetype='audio/wav',
-                    as_attachment=True,             # Dice al browser di scaricare
-                    download_name='Fm_sequence.wav'    # Nome del file scaricato
+                    as_attachment=True,
+                    download_name='Fm_sequence.wav'
                 )
-            else:
-                # Se è play normale, stream per il player
+            else: # play
                 return send_file(
                     memory_file, 
                     mimetype='audio/wav'
@@ -89,9 +85,9 @@ def generate_audio():
             
         except json.JSONDecodeError:
             print("Errore JSON")
-            return "Errore dati", 400
+            return "Data Error", 400
         except Exception as e:
-            print(f"Errore generico: {e}")
-            return "Errore server", 500
+            print(f"Generic Error: {e}")
+            return "Server Errore", 500
             
-    return "Nessun dato ricevuto", 400
+    return "No Data Recieved", 400

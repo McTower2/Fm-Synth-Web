@@ -1,6 +1,6 @@
 """
 DISCLAIMER:
-If you want to use this directory as standalone code (without web part, only code)
+If you want to use this directory as standalone code (only synth/* without the web part)
 you need to unmake the "module pack". To do so: 
 
 1. delete the file __init__.py
@@ -70,31 +70,11 @@ class Synthesiser:
         try:
             for voice in self._voices:
                 voice.initialize_modMatrix()
-        except: print("Synthesier -> unable to initialize modMatrix")
+        except Exception: print("Synthesier -> unable to initialize modMatrix")
     
-
-    def noteOn(self, midiNote, numSamples:int=None):
-        """Trova una voce libera o rimpiazza quella più vecchia."""
-        free_voice = next((v for v in self._voices if not v.isPlaying()), None)
-        if free_voice is None: # noteStealing:
-            return             # do nothing
-        #free_voice.resetOperatorsPhase()
-        frequency = self.midiNoteToFreq(midiNote)
-        free_voice.noteOn(frequency, numSamples)
-    
-    def noteOff(self, midiNote):
-        frequency = self.midiNoteToFreq(midiNote)
-        for voice in self._voices:
-            if voice.frequency == frequency:
-                voice.noteOff()
-
-    def allNotesOff(self):
-        for voice in self._voices:
-            voice.noteOff()
-
     def getNextSample(self):
-        """returns the next sample as sum of every voice"""
-        smp = sum(v.getNextSample() for v in self._voices)
+        """returns the next sample as sum of every voice's next sample"""
+        smp = sum(voice.getNextSample() for voice in self._voices)
         return smp
 
     def render(self, numSamples: int) -> List[float]:
@@ -104,13 +84,35 @@ class Synthesiser:
             buffer[i] = self.getNextSample()
         return buffer
     
+    def noteOn(self, midiNote:int, numSamples:int=None) -> None:
+        """ Assign the note playback to a free voice """
+        free_voice = next((v for v in self._voices if not v.isPlaying()), None)
+        
+        if free_voice is None: # noteStealing:
+            return             # to implement in the future
+        
+        #free_voice.resetOperatorsPhase()       # Optional: phase retrig (oscillators)
+        #free_voice.resetLfosPhase()            # Optional: phase retrig (LFOs)
+        frequency = self.midiNoteToFreq(midiNote)
+        free_voice.noteOn(frequency, numSamples)
+    
+    def noteOff(self, midiNote:int) -> None:
+        frequency = self.midiNoteToFreq(midiNote)
+        for voice in self._voices:
+            if voice.frequency == frequency:
+                voice.noteOff()
+
+    def allNotesOff(self):
+        for voice in self._voices:
+            voice.noteOff()
+
     def resetPhases(self):
-        """ resets operators phase (used in routes/audio_routes.py) """
+        """ resets each operator's phase (used in routes/audio_routes.py) """
         for voice in self._voices:
             voice.resetOperatorsPhase()
     
     def resetLfoPhases(self):
-        """ resets lfos phase (used in routes/audio_routes.py) """
+        """ resets each lfo's phase (used in routes/audio_routes.py) """
         for voice in self._voices:
             voice.resetLfosPhase()
     

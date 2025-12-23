@@ -1,22 +1,24 @@
 class Adsr:
     """
-    Linear ADSR envelope con amplitude scalabile e gate.
-    Gate=True parte l'inviluppo, Gate=False parte la release.
-    L'inviluppo ritorna valori tra 0 e self.amplitude.
-    valori dei parametri in millisecondi
+    Linear ADSR envelope defined between 0 and amplitude.
+    for the ADSR to start it is necessary to call setGate(True).
+    While the gate is on, setGate(False) starts the release phase.
+    parameters in milliseconds.
     """
 
     def __init__(self, attack=10.0, decay=100.0, sustain=0.7, release=200.0, amplitude=1.0, sample_rate=44100):
         self._sr = sample_rate
         self._sr_ms_smp = int(self._sr*0.001) #to get from ms to samples
         self._sr_smp_ms = self._sr*1000 #to get from samples to ms
-        # Tempi in campioni
+        
+        # times (in samples)
         self._attack = 0
         self._decay = 0
         self._release = 0
         self._sustain = sustain
         self._amplitude = amplitude
-        # Stato dell'inviluppo
+
+        # Envelope state
         self._gate = False
         self._phase = "idle"
         self._value = 0.0
@@ -58,7 +60,7 @@ class Adsr:
         return self._decay
     
     def setSustain(self, sustain: float):
-        """Set attack parameter"""
+        """Set sustain parameter"""
         self._sustain = max(sustain, 0)
     def getSustain(self):
         """returns sustain parameter"""
@@ -72,21 +74,22 @@ class Adsr:
         return self._release
     
     def setAmplitude(self, amplitude):
-        self._amplitude = amplitude #Nota: può andare in negativo
+        self._amplitude = amplitude #Note: can be negative
         
     def getAmplitude(self):
         """returns max amplitude of the ADSR"""
         return self._amplitude
 
     def setGate(self, gate: bool, numSamples: int = None):
-        """ Setta il gate. Se numSamples è specificato, mantiene il gate True per quel numero di campioni. """
-        if gate and not self._gate: #se prima era spento
+        """ Sets the gate (ON=True, OFF=False). 
+        if numSamples is specified, the gate will be turned off automatically and release will start.
+        Otherwise it must be done manually """
+        if gate and not self._gate: # start
             self._gate = True
             self._phase = "attack"
             self._index = 0
-            if numSamples is not None:
-                self._gate_countdown = numSamples
-        elif not gate and self._gate: #
+            self._gate_countdown = None if numSamples is None else numSamples
+        elif not gate and self._gate: # release
             self._gate = False
             self._phase = "release"
             self._index = 0
@@ -96,11 +99,10 @@ class Adsr:
         return self._phase != "idle"
 
     def getSample(self):
-        """Ritorna il prossimo campione dell'inviluppo e aggiorna lo stato (ricorda di attivare il gate)"""
+        """ Returns next ADSR sample (remember to setGate before) """
         if not self.isPlaying():
             return 0.0
 
-        # Aggiorna countdown se gate temporizzato
         if self._gate_countdown is not None:
             self._gate_countdown -= 1
             if self._gate_countdown <= 0:
@@ -131,7 +133,7 @@ class Adsr:
             start_val = self._value if self._index == 0 else self._release_start
             self._value = start_val * (1 - self._index / max(1, self._release))
             if self._index == 0:
-                self._release_start = start_val  # salva valore di partenza
+                self._release_start = start_val
             self._index += 1
             if self._index >= self._release:
                 self._phase = "idle"

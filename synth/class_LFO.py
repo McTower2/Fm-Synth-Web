@@ -1,16 +1,21 @@
 from math import pi, sin
 
 class LFO:
+    """Simple LFO class with control over frequency, waveform, smoothing, phase"""
     def __init__(self, frequency=1.0, waveform=0, smoothing=0.0, phase=0.0, sample_rate=44100):
+        # rates and constants
         self.sr = sample_rate
-        self.hz = 2*pi/self.sr
         self.twopi = 2*pi
+        self.hz = self.twopi/self.sr
         self.srInv = 1/self.sr
+
+        #Smoothing parameters
         self._smoothEnabled = False
         self._smoothSamples:int = 0
         self._currentValue = 0.0
         self._targetValue = 0.0
         self._smoothIncrement = 0.0
+
         # LFO parameters
         self.waveform = waveform
         self.frequency = frequency
@@ -18,7 +23,7 @@ class LFO:
         self.setSmoothing(smoothing)
 
     def _smoothLfo(self, newValue: float) -> float:
-        """Interpola verso newValue in _smoothSamples campioni."""
+        """Interpolates towards newValue in _smoothSamples time."""
         if not self._smoothEnabled or self._smoothSamples <= 1:
             self._currentValue = newValue
             return newValue
@@ -34,9 +39,9 @@ class LFO:
 
     def setSmoothing(self, smooth: float):
         """
-        Imposta lo smoothing dell'LFO in maniera normalizzata tra 0 e 1.
-        0 = nessuno smoothing
-        1 = massimo smoothing (25% del periodo dell'LFO)
+        Set LFO smoothing value normalized between 0 and 1.
+        0 = no smoothing
+        1 = max smoothing (25% of LFO period)
         """
         smooth = min(max(0.0, smooth), 1.0)
         if smooth == 0.0:
@@ -51,7 +56,7 @@ class LFO:
 
 
     def set_frequency(self, frequency):
-        """Imposta la frequenza dell'LFO"""
+        """set LFO frequency"""
         self.frequency = frequency
 
     def set_phase(self, phase):
@@ -65,14 +70,14 @@ class LFO:
         3: saw down,  
         4: square"""
         if not waveform in (0, 1, 2, 3, 4):
-            raise ValueError("LFO: waveform not valid, must be in range (0, 4)")
+            raise ValueError("LFO: invalid waveform index")
         self.waveform = waveform
     
     def getNextSample(self):
         sampleValue = 0.0
-        if self.waveform == 0: # Sinusoidale
+        if self.waveform == 0: # Sinusoid
                 sampleValue = sin(self.twopi * self.phase)
-        elif self.waveform == 1: #Triangular
+        elif self.waveform == 1: #Triangle
             sampleValue = 4.0 * abs(self.phase - 0.5) - 1.0
         elif self.waveform == 2: #Saw UP
             sampleValue = 2.0 * self.phase - 1.0

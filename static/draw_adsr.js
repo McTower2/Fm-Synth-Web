@@ -1,8 +1,7 @@
 class ADSRVisualizer {
-    // Aggiungiamo 'color' come argomento, con un default verde se non specificato
     constructor(suffix, color = '#00ff88') {
         this.suffix = suffix;
-        this.color = color; // Salviamo il colore nell'istanza
+        this.color = color;
         
         this.canvas = document.getElementById(`adsrCanvas_${suffix}`);
         if (!this.canvas) return;
@@ -31,24 +30,18 @@ class ADSRVisualizer {
         this.draw();
     }
 
-// --- Helper: Converte Hex (#RRGGBB o #RRGGBBAA) in "r, g, b" ---
+    //converts hexadecimal to rgb
     hexToRgb(hex) {
-        // 1. Rimuovi il cancelletto
         hex = hex.replace(/^#/, '');
 
-        // 2. Se ci sono 8 cifre (RRGGBBAA), teniamo solo le prime 6 (RRGGBB)
-        // Ignoriamo l'alpha finale perché lo gestiamo noi nel gradiente
+        // ignore alpha by taking first 6 values
         if (hex.length === 8) {
             hex = hex.substring(0, 6);
         }
-
-        // 3. Parsing sicuro tramite substring
-        // (Molto più sicuro dei bitwise operator su numeri grandi in JS)
         const bigint = parseInt(hex, 16);
         const r = (bigint >> 16) & 255;
         const g = (bigint >> 8) & 255;
         const b = bigint & 255;
-
         return `${r}, ${g}, ${b}`;
     }
 
@@ -84,7 +77,7 @@ class ADSRVisualizer {
     }
 
     draw() {
-        const { ctx, inputs, drawW: w, drawH: h, color } = this; // Estraiamo anche 'color'
+        const { ctx, inputs, drawW: w, drawH: h, color } = this;
 
         ctx.clearRect(0, 0, w, h);
         this.drawGrid();
@@ -115,7 +108,7 @@ class ADSRVisualizer {
         const yPeak = padding;
         const ySust = yBase - (rS * graphH);
 
-        // --- Disegno Linea ---
+        // Draw lines
         ctx.beginPath();
         ctx.moveTo(x0, yBase); // start point
         ctx.lineTo(xA, yPeak); // attack
@@ -127,32 +120,30 @@ class ADSRVisualizer {
         ctx.lineCap = 'round';
         ctx.lineWidth = 3;
         
-        // 1. Usa il colore dinamico per la linea
+        // line
         ctx.strokeStyle = color; 
-        
-        // 2. Usa il colore dinamico per il glow (ombra)
+        // line shadow
         ctx.shadowBlur = 15;
         ctx.shadowColor = color;
         
         ctx.stroke();
 
-        // --- Disegno Riempimento Sfumato ---
         ctx.shadowBlur = 0;
         ctx.lineTo(xR, h);
         ctx.lineTo(x0, h);
         ctx.closePath();
 
-        // 3. Usa l'helper per creare i colori rgba del gradiente
+        // define gradient
         const rgb = this.hexToRgb(color);
         const grad = ctx.createLinearGradient(0, 0, 0, h);
         
-        grad.addColorStop(0, `rgba(${rgb}, 0.4)`); // Opacità 0.4
-        grad.addColorStop(1, `rgba(${rgb}, 0.0)`); // Opacità 0
+        grad.addColorStop(0, `rgba(${rgb}, 0.4)`); // opacity 0.4
+        grad.addColorStop(1, `rgba(${rgb}, 0.0)`); // opacity 0
         
         ctx.fillStyle = grad;
         ctx.fill();
 
-        // 4. Pallini (restano bianchi o li vuoi colorati?)
+        // dots
         ctx.fillStyle = '#fff'; 
         [[xA, yPeak], [xD, ySust], [xS, ySust]].forEach(([dx, dy]) => {
             ctx.beginPath();
@@ -171,21 +162,16 @@ class ADSRVisualizer {
     }
 }
 
-/////////////////////////////////////////////////
-// LOGICA COLORI
-
+// COLORS Logic
 let algorithmKnob = document.getElementById("algorithm")
 
-// Definizione palette colori per i ruoli
 const ROLE_COLORS = {
-    CARRIER:  '#4a2c2a', // Rosso mattone molto scuro/spento
-    MOD:      '#ff5722', // Arancione lava (Tipico Elektron)
-    CHAIN:    '#ffab00', // Giallo ambra brillante (Focus massimo)
-    AMP:      '#FFFFFF'  // Bianco Puro
+    CARRIER:  '#4a2c2a',
+    MOD:      '#ff5722',
+    CHAIN:    '#ffab00',
+    AMP:      '#FFFFFF' 
 };
 
-
-// Mappatura Algoritmi -> Ruoli Operatori (A, B1, B2)
 const ALGO_MAPPING = {
     1: { A: 'MOD',    B2: 'MOD',    B1: 'CHAIN' },     
     2: { A: 'MOD',    B2: 'MOD',    B1: 'CARRIER' },
@@ -197,40 +183,35 @@ const ALGO_MAPPING = {
     8: { A: 'MOD',    B2: 'CARRIER',B1: 'CARRIER'}
 };
 
-// Oggetto per memorizzare le istanze per accesso rapido via suffisso
 let adsrRegistry = {};
 
 window.addEventListener('load', () => {
     
-    // 1. Inizializza AMP (sempre bianco)
+    // initialize amp
     if(document.getElementById('adsrCanvas_amp')) {
         adsrRegistry['amp'] = new ADSRVisualizer('amp', ROLE_COLORS.AMP);
     }
 
-    // --- LOGICA AGGIUNTA ---
-    // Recuperiamo l'algoritmo corrente
     const algorithmKnob = document.getElementById("algorithm");
     const currentAlgo = algorithmKnob ? (parseInt(algorithmKnob.value) || 1) : 1;
-    
-    // Recuperiamo la mappa dei ruoli per questo algoritmo (es. { A: 'MOD', B1: 'CHAIN'... })
     const currentMap = ALGO_MAPPING[currentAlgo]; 
 
-    // 2. Inizializza Operatori con il colore GIUSTO da subito
+    // initialize operators
     ['A', 'B1', 'B2'].forEach(suffix => {
         if(document.getElementById(`adsrCanvas_${suffix}`)) {
             
-            // A. Cerchiamo il ruolo nella mappa. Se non c'è, fallback a CARRIER
+            // Get operator's role
             const role = (currentMap && currentMap[suffix]) ? currentMap[suffix] : 'CARRIER';
             
-            // B. Otteniamo il colore
+            // get color
             const initialColor = ROLE_COLORS[role];
 
-            // C. Passiamo il colore direttamente al costruttore
+            // initialize with right color
             adsrRegistry[suffix] = new ADSRVisualizer(suffix, initialColor);
         }
     });
 
-    // 3. Agganciamo il listener per i cambiamenti futuri
+    // automatic redraw based on algorithm changes
     if (algorithmKnob) {
         algorithmKnob.addEventListener('input', (e) => {
             const val = parseInt(e.target.value) || 1;
@@ -244,19 +225,17 @@ window.addEventListener('resize', () => {
 });
 
 /**
- * Funzione Pubblica: Chiama questa quando giri la knob Algorithm
- * @param {number} algoIndex - Indice algoritmo (1-8)
+ * @param {number} algoIndex
  */
 function setAdsrAlgorithm(algoIndex) {
     const map = ALGO_MAPPING[algoIndex];
     if (!map) return;
 
-    // Itera su A, B1, B2 definiti nella mappa
+    // Iterate on A, B1, B2
     Object.keys(map).forEach(suffix => {
-        const role = map[suffix];     // es. 'CARRIER', 'MOD', 'CHAIN'
-        const color = ROLE_COLORS[role]; // Recupera il colore hex
+        const role = map[suffix];     // e.g. 'CARRIER', 'MOD', 'CHAIN'
+        const color = ROLE_COLORS[role];
         
-        // Se l'istanza esiste, aggiorna il colore
         if (adsrRegistry[suffix]) {
             adsrRegistry[suffix].updateColor(color);
         }

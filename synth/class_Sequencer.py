@@ -16,6 +16,10 @@ class Sequencer:
     # ---------------------------
     # PUBLIC INTERFACE
     # ---------------------------
+    def _initialize_sequencer(self, synth) -> None:
+        """attaches the synthesiser to this class"""
+        self.synth = synth
+
     def create_sequence(self, sequence: list, step_len: float, numLoops: int = 1, sample_rate=44100) -> np.ndarray[float]:
         """
         Simple polyphonic sequencer with fixed step length.
@@ -53,42 +57,39 @@ class Sequencer:
     # ---------------------------
     # INTERNAL HELPERS
     # ---------------------------
-    def _initialize_sequencer(self, synth):
-        """attach synthesiser to this class"""
-        self.synth = synth
 
-    def _parse_step(self, step):
-        """Converte uno step della sequenza in una lista di note MIDI."""
+    def _parse_step(self, step) -> list:
+        """ Converts a sequence step into a list of integers (MIDI compliant) """
         if step is None:
             # Silence step
             return []
 
-        if isinstance(step, int):
+        if isinstance(step, int): # it's already a integer
             return [step]
 
         if isinstance(step, str):
-            return [self.note_str_to_midi(step)]
+            return [self.note_str_to_midi(step)] # conversion e.g: 'C4' -> 60
 
         if isinstance(step, tuple):
-            return [self._convert_note(n) for n in step]
+            return [self._convert_note(n) for n in step] # conversion e.g: ('C4', 'E4') -> [60, 64]
 
-        raise TypeError(f"Tipo di step non valido: {type(step)}")
+        raise TypeError(f"Invalid step type: {type(step)}")
 
     def _convert_note(self, note):
-        """Converte una singola nota (str o int) in MIDI number."""
+        """Converts a single note (str o int) into integer (MIDI compliant)."""
         if isinstance(note, int):
             return note
         if isinstance(note, str):
             return self.note_str_to_midi(note)
-        raise TypeError(f"Tipo di nota non valido: {type(note)}")
+        raise TypeError(f"Invalid note type: {type(note)}")
 
     def _trigger_notes(self, notes: list, step_samples: int):
-        """Invoca noteOn per ciascuna nota dello step."""
+        """ Invokes noteOn() for each note in the current step. """
         for note in notes:
             self.synth.noteOn(note, step_samples)
 
     def _render_release_tail(self, sample_rate):
-        """Renderizza la coda del suono (release)."""
+        """ Renders the tail (release) of the sound after the end of last step."""
         tail_len = int(self.synth.sound.getReleaseAmp() * 0.001 * sample_rate)
         return self.synth.render(tail_len)
 
@@ -98,26 +99,26 @@ class Sequencer:
 
     def note_str_to_midi(self, note_str: str) -> int:
         """
-        Converte una nota (es. 'C4', 'C#3', 'Bb2') nel numero MIDI corrispondente.
-        C4 = 60 (nota centrale del pianoforte).
+        Converts a note from string (e.g. 'C4', 'C#3', 'Bb2') in the coresponding MIDI note number (integer).
+        * as a reference: 'C4' = 60
         """
         note_str = note_str.strip().upper()
-        # Divide nota e ottava
+        # Divide note and octave
         i = 0
         while i < len(note_str) and not (note_str[i].isdigit() or note_str[i] == "-"):
             i += 1
         note_name = note_str[:i]
         octave_str = note_str[i:]
         if note_name not in self.note_map:
-            raise ValueError(f"Nota non riconosciuta: '{note_name}'")
+            raise ValueError(f"Unrecognized note: '{note_name}'")
         try:
             octave = int(octave_str)
         except ValueError:
-            raise ValueError(f"Ottava non valida in '{note_str}'")
+            raise ValueError(f"Invalid octave in '{note_str}'")
         semitone = self.note_map[note_name]
         midi_number = 12 * (octave + 1) + semitone
         if not (0 <= midi_number <= 127):
-            raise ValueError(f"Nota fuori dal range MIDI: {midi_number}")
+            raise ValueError(f"Note value out of MIDI range: {midi_number}")
         return midi_number
 
 if __name__ == "__main__":
@@ -128,7 +129,7 @@ if __name__ == "__main__":
     seq=Sequencer()
     seq._initialize_sequencer(syn)
 
-    sig = seq.create_sequence(["a4", "c4", None], 0.5, 1)
+    audio_output = seq.create_sequence(["a4", "c4", None], 0.5, 1)
 
-    play(sig)
+    play(audio_output)
     wait()

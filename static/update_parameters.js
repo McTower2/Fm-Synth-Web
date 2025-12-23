@@ -1,15 +1,15 @@
-// qui tutte le funzioni setter di parametri che verranno intercettate da python
+// every parameter's setter function pass from here and goes to python
 
-// funzione per cambiare un generico parametro (solo per parametri float)
+// float generic parameters
 async function sendParam(paramName, value) {
-    console.log(`Aggiornamento: ${paramName} -> ${value}`);
+    console.log(`Updating: ${paramName} -> ${value}`);
 
     try {
-        // questa rotta è una funzione definita in ../routes/api_routes.py
+        // function defined in ../routes/api_routes.py
         const response = await fetch('/api/update-param', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            // pacchetto standard: { "name": "...", "value": ... }
+            // standard json: { "name": "...", "value": ... }
             body: JSON.stringify({ 
                 name: paramName, 
                 value: value 
@@ -18,17 +18,17 @@ async function sendParam(paramName, value) {
 
         if (!response.ok) throw new Error(response.statusText);
     } catch (error) {
-        console.error("Errore sync:", error);
+        console.error("sync error:", error);
     }
 }
 
+// lfos parameters
 async function sendLfoParam(paramName, value, lfoIndex) {
-    console.log(`Aggiornamento: ${paramName} -> ${value}. lfo index${lfoIndex}`);
+    console.log(`Updating: ${paramName} -> ${value}. lfo index${lfoIndex}`);
     try {
         const response = await fetch('/api/update-lfo-param', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            // Inviamo un pacchetto standard: { "name": "...", "value": ... }
             body: JSON.stringify({ 
                 name: paramName, 
                 value: value,
@@ -38,12 +38,13 @@ async function sendLfoParam(paramName, value, lfoIndex) {
 
         if (!response.ok) throw new Error(response.statusText);
     } catch (error) {
-        console.error("Errore sync:", error);
+        console.error("sync error:", error);
     }
 }
 
+// exponential envelope parameters
 async function sendEnvParam(paramName, value) {
-    console.log(`Aggiornamento: ${paramName} -> ${value}.`);
+    console.log(`Updating: ${paramName} -> ${value}.`);
     try {
         const response = await fetch('/api/update-env-param', {
             method: 'POST',
@@ -56,21 +57,21 @@ async function sendEnvParam(paramName, value) {
 
         if (!response.ok) throw new Error(response.statusText);
     } catch (error) {
-        console.error("Errore sync:", error);
+        console.error("sync error:", error);
     }
 }
 
-// funzione per modificare un parametro specifico
+// specific for algorithm parameter (int)
 async function setAlgorithm(paramName, value) {
-    console.log("Valore finale (rilascio):", value);
+    console.log("Updating algorithm:", value);
     try {
-        const response = await fetch('/api/set-algorithm', { // rotta da chiamare
+        const response = await fetch('/api/set-algorithm', {
             method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ algorithm: value }) // nome del parametro
+            body: JSON.stringify({ algorithm: value })
         });
-        if (!response.ok) {throw new Error(`Errore HTTP: ${response.status}`);}
+        if (!response.ok) throw new Error(response.statusText);
     } catch (error) {
-        console.error("Errore nell'invio del dato:", error);
+        console.error("Error while sending the parameter:", error);
     }
 
 }

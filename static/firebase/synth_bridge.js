@@ -1,55 +1,54 @@
 import { saveToFirebase, loadAllFromFirebase, checkIdByName, overwriteToFirebase } from "./db_manager.js";
 
 // ==========================================
-// GESTIONE SYNTH PRESET
+// SYNTH PRESET
 // ==========================================
+
+// save synth preset to database
 export async function handleSavePreset() {
     try {
-        console.log("Richiesta parametri al Synth Python...");
+        console.log("Parameters requested to Python Server...");
 
-        // Nota: '/api' deriva dal prefix del tuo blueprint in server.py
         const response = await fetch('/api/synth/preset'); 
-        if (!response.ok) { throw new Error("Errore nella risposta del server Python"); }
+        if (!response.ok) { throw new Error("Error in Python answer"); }
 
-        //  dizionario parametri che arriva da python: params_to_dict()
         const presetData = await response.json(); 
-        console.log("Dati ricevuti da Python:", presetData);
+        console.log("Preset data recieved:", presetData);
 
         const name = prompt("Preset Name:", "");
-        if (!name) return; // Annulla se l'utente preme Cancel
+        if (!name) return; // cancel
 
         const existingId = await checkIdByName("presets", name);
 
-        if (existingId) {
-            // NOME PRESET ESISTENTE: CONFERMI?
+        if (existingId) { // OVERWRITE FILE
             const userConfirmed = confirm(`Preset '${name}' already exists.\nDo you wish to override it?`);
             
             if (userConfirmed) {
-                // SOVRASCRIVI
+                // overwrite confirmed
                 await overwriteToFirebase("presets", existingId, {
                     name: name, type: "synth_patch", data: presetData
                 });
-            } else { // Utente ha cliccato "Annulla" nel confirm
-                console.log("Salvataggio annullato dall'utente.");
+            } else { // overwrite canceled
+                console.log("Preset save canceled from the user.");
                 return; 
             }
         } else {
-            // 3b. CASO NUOVO: SALVA NORMALE
+            // NORMAL SAVE
             await saveToFirebase("presets", { 
                 name: name, type: "synth_patch", data: presetData 
             });
         }
         } catch (e) {
-        console.error("Errore save preset:", e);
+        console.error("Error while saving preset:", e);
         alert("Error while saving preset.");
     }
 }
 
 
-// mappa per tradurre parametri python a ID HTML
+// Parameters map. Python:html_ID
 const PARAM_MAP = {
     "Algorithm": "algorithm",
-    //"Amp": non deve essere gestito qua. è destinazione di modulazione ma non parametro visibile all'utente
+    //"Amp": not visible to user
     "AttackA": 'attack_A',
     "AttackAmp": 'attack_amp',
     "AttackB1": 'attack_B1',
@@ -88,9 +87,9 @@ const PARAM_MAP = {
     };
 
 
-// Funzione interna per applicare i dati al frontend
+// apply preset data to frontend (and backend consequently)
 function applyPresetState(presetData) {
-    console.log("Applicazione Preset:", presetData);
+    console.log("setting Preset Data:", presetData);
 
     const lfoSuffixes = ["dest", "amt", "rate", "wave", "smooth"];
 
@@ -98,45 +97,36 @@ function applyPresetState(presetData) {
         
         const htmlId = PARAM_MAP[pythonKey]; // HTML id to change the object value
 
-        if (!htmlId) {
-            console.warn(`Chiave Python '${pythonKey}' ignorata (nessun ID HTML mappato).`);
-            continue;
-        }
+        if (!htmlId) { continue; }
 
-        // DIRAMAZIONE: È un Array (LFO) o un valore singolo?
+        // 2 cases: here it's an LFO (array)
         if (Array.isArray(value)) {
-            // CASO LFO (Array di valori) - htmlId qui vale "lfo1", "lfo2" o "lfo3"
-            
             value.forEach((val, index) => {
-                // Costruiamo l'ID finale: "lfo1" + "rate" = "lfo1rate"
-                if (val === null) { val = "None"; } // per LfoDestination
+                if (val === null) { val = "None"; } // LfoDestination safe conversion
                 const suffix = lfoSuffixes[index];
-                const targetId = htmlId + suffix; 
+                const targetId = htmlId + suffix; // e.g. lfo1dest, lfo2amt...
                 
-                // Aggiorniamo il singolo parametro dell'LFO
+                // Update single parameter
                 if (typeof window.setValueAndChange === 'function') {
                     window.setValueAndChange(targetId, val);
                 }
             });
 
-        } else {
-            // CASO STANDARD (Valore singolo)
-            
-            let finalValue = value;
-            // Fix per EnvDestination: Python None -> HTML "None"
-            if (finalValue === null) { finalValue = "None"; }
+        } else { // standard case (1 parameter)
+            if (value === null) { value = "None"; } // envDestination safe conversion
 
-            // Aggiorniamo il parametro standard
+            // Update single parameter
             if (typeof window.setValueAndChange === 'function') {
-                window.setValueAndChange(htmlId, finalValue);
+                window.setValueAndChange(htmlId, value);
             }
         }
     }
 }
 
+// Load synth preset from database
 export async function handleLoadPreset() {
     try {
-        // Scarica da Firebase
+        // Download from Firebase
         const presets = await loadAllFromFirebase("presets");
         
         if (presets.length === 0) {
@@ -144,58 +134,56 @@ export async function handleLoadPreset() {
             return;
         }
 
-        // Menu di scelta ->  numero: nome_preset
+        // existing presets list ->  Number: preset_name
         let msg = "ID Preset:\n" + presets.map((p, i) => `${i}: ${p.name}`).join("\n");
         const choice = prompt(msg);
 
         if (choice !== null && presets[choice]) {
-            const selectedData = presets[choice].data; // Questo è il dizionario Python
+            const selectedData = presets[choice].data; //preset values dictionary
 
-            // APPLICAZIONE TRAMITE FRONTEND
             applyPresetState(selectedData);
         }
     } catch (e) {
-        console.error("Errore load preset:", e);
+        console.error("Error while loading preset:", e);
     }
 }
 
 // ==============================
-// GESTIONE SEQUENZE
+// SEQUENCES
 // ==============================
 
 // SAVE
 export async function handleSaveSequence() {
     try {
         if (typeof window.getSequencerState !== 'function') {
-            alert("Error: sequencer.js doesn't have the right function");
+            alert("Error: saving function not found");
             return;
         }
         const rawSeqData = window.getSequencerState();
         const dataString = JSON.stringify(rawSeqData);
 
         const name = prompt("Sequence Name:", "");
-        if (!name) return; // Annulla se l'utente preme Cancel o lascia vuoto
+        if (!name) return; // Cancel
 
-        // 3. Controllo se esiste già una sequenza con questo nome
+        // does the name already exist?
         const existingId = await checkIdByName("sequences", name);
 
-        if (existingId) {
-            //CASO ESISTENTE: Chiedi conferma per sovrascrivere
-            const userConfirmed = confirm(`Sequence '${name}' already exists.\nDo you wish to overwrite it?`);
+        if (existingId) { // case overwrite
+            const userConfirmed = confirm(`The name '${name}' already exists.\nDo you wish to overwrite the sequence?`);
             
             if (userConfirmed) {
-                // SOVRASCRIVI
+                // overwrite
                 await overwriteToFirebase("sequences", existingId, {
                     name: name, type: "sequencer_data", content: dataString
                 });
                 console.log(`Sequence '${name}' overwritten.`);
             } else { 
-                // ANNULLA
+                // cancel overwrite
                 console.log("Save cancelled by user.");
                 return; 
             }
         } else {
-            // 4b. CASO NUOVO: Salva normalmente
+            // normal save
             await saveToFirebase("sequences", {
                 name: name, type: "sequencer_data", content: dataString
             });
@@ -210,7 +198,7 @@ export async function handleSaveSequence() {
 // LOAD
 export async function handleLoadSequence() {
     try {
-        // Scarica lista dal DB
+        // download from DB
         const sequences = await loadAllFromFirebase("sequences");
         
         if (sequences.length === 0) {
@@ -218,7 +206,7 @@ export async function handleLoadSequence() {
             return;
         }
 
-        // Crea menu di scelta
+        // Presets menu
         let msg = "ID sequence to insert:\n";
         sequences.forEach((seq, index) => {
             msg += `${index}: ${seq.name}\n`;
@@ -226,24 +214,22 @@ export async function handleLoadSequence() {
         
         const choice = prompt(msg);
         
-        // Applica se valido
+        // apply if valid
         if (choice !== null && sequences[choice]) {
             const dataString = sequences[choice].content;
             const dataToLoad = JSON.parse(dataString);
 
-            // Chiama la funzione in sequencer.js
+            // Call function in sequencer.js
             if (typeof window.applySequencerState === 'function') {
                 window.applySequencerState(dataToLoad);
-                //alert(`Sequenza '${sequences[choice].name}' caricata!`);
             } else {
                 console.error("Function applySequencerState not found.");
             }
         }
     } catch (error) {
-        console.error("Errore load sequence:", error);
+        console.error("Error while loading sequence preset:", error);
     }
 }
 
-// (Opzionale) Esponi queste funzioni globalmente per poterle chiamare dall'HTML
 window.handleSaveSequence = handleSaveSequence;
 window.handleLoadSequence = handleLoadSequence;

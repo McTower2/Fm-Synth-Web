@@ -79,7 +79,7 @@
                   <div class="control-wrapper">
                     <span class="label">R</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="release_A" min="10" max="2000" value="300" step="0.1" tooltip="RELEASE A (ms)" direction="vert"
+                      id="release_A" min="10" max="2000" value="1500" step="0.1" tooltip="RELEASE A (ms)" direction="vert"
                       onchange="sendParam('release_A', this.value)"   
                     ></webaudio-slider><webaudio-param link="release_A" fontsize="9"></webaudio-param>
                   </div>  
@@ -188,7 +188,7 @@
                   <div class="control-wrapper">
                     <span class="label">R</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="release_B2" min="10" max="2000" value="300" step="0.1" tooltip="RELEASE B2 (ms)" direction="vert"
+                      id="release_B2" min="10" max="2000" value="1500" step="0.1" tooltip="RELEASE B2 (ms)" direction="vert"
                       onchange="sendParam('release_B2', this.value)"   
                     ></webaudio-slider><webaudio-param link="release_B2" fontsize="9"></webaudio-param>
                   </div>  
@@ -205,7 +205,6 @@
           <div class="section-title">LFO 1</div>
             <div class="knob-col">
 
-              <!-- dest -->
               <div class="control-wrapper">
                 <span class="label">DESTINATION</span>
                 <div class="select-container">
@@ -217,7 +216,6 @@
                 </div>
               </div>
               
-              <!-- wave -->
               <div class="control-wrapper">
                 <span class="label">WAVEFORM</span>
                 <div class="select-container">
@@ -394,7 +392,7 @@
                   <div class="control-wrapper">
                     <span class="label">R</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="release_amp" min="10" max="2000" value="400" step="0.1" tooltip="RELEASE amp (ms)" direction="vert"
+                      id="release_amp" min="10" max="2000" value="600" step="0.1" tooltip="RELEASE amp (ms)" direction="vert"
                       onchange="sendParam('release_amp', this.value)"   
                     ></webaudio-slider><webaudio-param link="release_amp" fontsize="9"></webaudio-param>
                   </div>  
@@ -471,7 +469,7 @@
                   <div class="control-wrapper">
                     <span class="label">R</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="release_B1" min="10" max="2000" value="300" step="0.1" tooltip="RELEASE B1 (ms)" direction="vert"
+                      id="release_B1" min="10" max="2000" value="1500" step="0.1" tooltip="RELEASE B1 (ms)" direction="vert"
                       onchange="sendParam('release_B1', this.value)"   
                     ></webaudio-slider><webaudio-param link="release_B1" fontsize="9"></webaudio-param>
                   </div> 
@@ -662,19 +660,19 @@
 
         const isWebAudio = el.tagName.toLowerCase().startsWith('webaudio-');
 
-        // IMPOSTA IL VALORE E LA GRAFICA DELLA MANOPOLA
+        // SET VALUE    
         if (isWebAudio && typeof el.setValue === 'function') {
-            // false = non sparare eventi automatici, li gestiamo sotto
+            // false = update manually later
             el.setValue(value, false); 
         } else {
             el.value = value;
         }
 
-        // AGGIORNA IL DISPLAY (webaudio-param)
+        // UPDATE DISPLAY (webaudio-param)
         el.dispatchEvent(new Event('input'));
 
-        // AGGIORNA PYTHON (Server)
-        // Il backend ascolta l'evento 'change'.
+        // UPDATE PYTHON (Server)
+        // backend reacts to "change"
         el.dispatchEvent(new Event('change'));
       }
     </script>

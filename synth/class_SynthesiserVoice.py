@@ -6,11 +6,11 @@ from .class_ModMatrix import ModMatrix
 
 class SynthesiserVoice:
     """This class is a child to SynthesiserSound: 
-        Every time a noteOn is called, an instance of this class synthesizes the sound, 
+        Every time a noteOn is called, an instance of this class generates the sound, 
         based on the sound parameters defined in SynthesiserSound.
         (This class must not call SynthesiserSound setters, only getters)"""
     def __init__(self, sound:SynthesiserSound, sample_rate:int=44100):
-        #fixed variables
+        # constants
         self._sound = sound
         self._sr = sample_rate
         # internal variables used for synthesis
@@ -53,7 +53,7 @@ class SynthesiserVoice:
             op.setFreq(self._freq)
 
         self._op_map = zip(
-            self.operators,
+            self.operators, # -> [self.A, self.B1, self.B2, self.C]
             [self._sound.get_ADSR_A, self._sound.get_ADSR_B1, self._sound.get_ADSR_B2, None],
             [self._sound.get_Params_A, self._sound.get_Params_B1, self._sound.get_Params_B2, self._sound.get_Params_C]
         )
@@ -63,12 +63,12 @@ class SynthesiserVoice:
                 a, d, s, r, lev = adsr_func()
                 ratio, fb = param_func()
                 op.setAllParameters(ratio, fb, a, d, s, r, lev)
-            else: # operator C
+            else: # operator C (it's always a carrier, doesn't feature an Adsr for Fm intensity)
                 ratio, fb = param_func()
                 op.setRatio(ratio)
                 op.setFeedback(fb)
         #lfos
-        self.modMatrix.update_parameters() # here after voice parameters
+        self.modMatrix.update_parameters() # updated after voice parameters (order matters)
         
     def resetOperatorsPhase(self):
         for op in self.operators:
@@ -77,8 +77,8 @@ class SynthesiserVoice:
     def resetLfosPhase(self):
         self.modMatrix.resetLfoPhases()
 
-    def isPlaying(self):
-        """returns if this voice is free to play a new note"""
+    def isPlaying(self) -> bool:
+        """returns if this voice is already playing a note"""
         return self.adsr_amp.isPlaying()
     
     @property
@@ -101,12 +101,13 @@ class SynthesiserVoice:
 # SYNTHESIS
     def noteOn(self, frequency:float, numSamples:int=None):
         """updates parameters according to SynthesiserSound and triggers all envelopes. optional: numSamples"""
-        self._freq = frequency #first update the internal frequency
-        self.update_static_parameters() #then update all parameters
-        #trigger all ADSR
+        self._freq = frequency #first update the voice frequency
+        self.update_static_parameters() #then update all parameters (operators frequency depends on voice frequency)
+        # trigger all ADSR
         self.adsr_amp.setGate(True, numSamples)
         for op in self.operators:
             op.noteOn(frequency, True, numSamples)
+        # prepare the modMatrix
         self.modMatrix.noteOn()
     
     def noteOff(self):
@@ -118,9 +119,11 @@ class SynthesiserVoice:
     def getNextSample(self):
         """returns next sample for this voice"""
         if not self.isPlaying():
-            self.modMatrix.advance_lfos() #so they keep running in the back
+            # Keep the LFOs synced
+            self.modMatrix.advance_lfos()
             return 0.0
-        self.modMatrix.apply_modulations() #modulate voice parameters
+        # modulate voice parameters
+        self.modMatrix.apply_modulations()
         # synthesis
         x, y = self._algo_func() #call to algo methods
         smp = y*self._mix_X + x*self._mix_Y #mix X and Y channels
@@ -254,9 +257,10 @@ if __name__ == "__main__":
 
     sr = 44100
     sig = []
-    voice.noteOn(frequency=440.0, numSamples=sr*2) #numSamples = None
-    # sovrascrivo la patch di sound
-    voice.adsr_amp.setParams(100, 200, 0.2, 500, None) # ampli
+    voice.noteOn(frequency=440.0, numSamples=sr*2)
+    
+    # here I overwrite manually the parameters to test
+    voice.adsr_amp.setParams(100, 200, 0.2, 500, None) # amp
     voice.A.setAdsrParams = (2000, 500, 0.5, 500, 6) # a
     voice.B2.setAdsrParams = (0.0, 50, 0.1, 500, 10) # b2
     voice._algo = 5
@@ -264,7 +268,6 @@ if __name__ == "__main__":
     for _ in range(sr*4):
         smp = voice.getNextSample()
         sig.append(smp)
-        #if i == sr*2:
-        #    voice.noteOff()
+
     play(sig)
     wait()
