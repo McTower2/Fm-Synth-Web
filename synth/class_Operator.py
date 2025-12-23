@@ -6,7 +6,7 @@ class Operator:
     """ FM Operator class. Composed of an FmFeedbackOsc and an Adsr, it outputs 2 signals:
      -  audio signal of the oscillator (between -1 and 1)
      -  control signal of the Adsr (between 'level' and 0)
-     +  note: the Adsr does not modulate the operator's amp"""
+     +  note: the Adsr does not affect the amp, it is a Phase Modulation (PM) intensity signal"""
     def __init__(self, frequency=440.0, ratio=1.0, feedback=0.0, 
                  attack=100.0, decay=200.0, sustain=0.4, release=300.0, level=0.0, 
                  sample_rate=44100):

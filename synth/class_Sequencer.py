@@ -1,6 +1,7 @@
 import numpy as np
 
 class Sequencer:
+    """ Simple sequencer class that manages the audio rendering of Synthesiser based on a sequence of notes """
     def __init__(self):
         self.synth = None
         self.note_map = {

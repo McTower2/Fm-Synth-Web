@@ -1,6 +1,7 @@
 from math import pi, sin
 
 class FmFeedbackOsc:
+    """sinusoidal oscillator with feedback capable of being modulated in phase from another oscillator"""
     def __init__(self, freq=440.0, feedback=0.0, phase=0.0, mul=1.0, sample_rate=44100):
         self._frequency = freq
         self._feedback = feedback

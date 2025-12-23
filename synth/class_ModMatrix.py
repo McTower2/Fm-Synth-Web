@@ -5,7 +5,7 @@ from typing import List
 
 class ModMatrix:
     """ ModMatrix composed of modulation sources and destinations. 
-    applies modulations dinamically and in real-time to the synthesiserVoice class """
+    applies modulations dynamically and in real-time to the synthesiserVoice class """
     def __init__(self, sample_rate = 44100):
         self._sr = sample_rate
 

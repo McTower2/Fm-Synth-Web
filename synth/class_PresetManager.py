@@ -4,6 +4,11 @@ from dataclasses import asdict
 DEFAULT_PRESET_FILE_NAME = "./FmSynth_presets.txt"
 
 class PresetManager:
+    """ A class used for accessing the synth state.
+    main functions:
+    * get a dictionary of parameters
+    * set parameters based on a dictionary
+    * save/load the dictionary to/from a local file """
     def __init__(self, sound: SynthesiserSound):
         self.sound = sound
     
