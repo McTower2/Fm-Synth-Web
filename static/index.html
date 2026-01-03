@@ -22,7 +22,7 @@
                 <div class="control-wrapper">
                   <span class="label">RATIO</span>
                   <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
-                    id="ratio_A" min="0.25" max="16.0" value="1" step="0.001" tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
+                    id="ratio_A" min="0.25" max="16.0" value="1" step="0.001" log="1" tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
                     onchange="sendParam('ratio_A', this.value)"
                   ></webaudio-knob> <webaudio-param link="ratio_A" fontsize="9"></webaudio-param>
                 </div>
@@ -30,7 +30,7 @@
                 <div class="control-wrapper">
                   <span class="label">FEEDBACK</span>
                   <webaudio-knob  src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
-                    id="feedback_A" min="0" max="5" value="0" step="0.001" tooltip="Waveform shaper. Morph: Sine › Saw › Noise."
+                    id="feedback_A" min="0.001" max="5" value="0.001" step="0.001" log="0.7" tooltip="Waveform shaper. Morph: Sine › Saw › Noise."
                     onchange="sendParam('feedback_A', this.value)"   
                   ></webaudio-knob><webaudio-param link="feedback_A" fontsize="9"></webaudio-param>
                 </div>
@@ -38,7 +38,7 @@
                 <div class="control-wrapper">
                   <span class="label">MOD LEVEL</span>
                   <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
-                    id="level_A" min="0" max="10" value="0" step="0.001" tooltip="Modulation Depth"
+                    id="level_A" min="0.001" max="10" value="0.001" step="0.001" log="0.1" tooltip="Modulation Depth of the ADSR"
                     onchange="sendParam('level_A', this.value)"
                     ></webaudio-knob><webaudio-param link="level_A" fontsize="9"></webaudio-param>
                 </div>
@@ -54,7 +54,7 @@
                   <div class="control-wrapper">
                     <span class="label">A</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="attack_A" min="0" max="2000" value="0" step="0.1" tooltip="ATTACK A (ms)" direction="vert"
+                      id="attack_A" min="1" max="2000" value="1" step="0.1" log="0.1" tooltip="ATTACK A (ms)" direction="vert"
                       onchange="sendParam('attack_A', this.value)"   
                     ></webaudio-slider><webaudio-param link="attack_A" fontsize="9"></webaudio-param>
                   </div>
@@ -62,7 +62,7 @@
                   <div class="control-wrapper">
                     <span class="label">D</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="decay_A" min="10" max="3000" value="200" step="0.1" tooltip="DECAY A (ms)" direction="vert"
+                      id="decay_A" min="10" max="3000" value="200" step="0.1" log="0.1" tooltip="DECAY A (ms)" direction="vert"
                       onchange="sendParam('decay_A', this.value)"   
                     ></webaudio-slider><webaudio-param link="decay_A" fontsize="9"></webaudio-param>
                   </div>
@@ -79,7 +79,7 @@
                   <div class="control-wrapper">
                     <span class="label">R</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="release_A" min="10" max="2000" value="1500" step="0.1" tooltip="RELEASE A (ms)" direction="vert"
+                      id="release_A" min="10" max="2000" value="1500" step="0.1" log="0.1" tooltip="RELEASE A (ms)" direction="vert"
                       onchange="sendParam('release_A', this.value)"   
                     ></webaudio-slider><webaudio-param link="release_A" fontsize="9"></webaudio-param>
                   </div>  
@@ -131,7 +131,7 @@
                 <div class="control-wrapper">
                   <span class="label">RATIO</span>
                   <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
-                    id="ratio_B2" min="0.25" max="16.0" value="1" step="0.001" tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
+                    id="ratio_B2" min="0.25" max="16.0" value="1" step="0.001" log="1"  tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
                     onchange="sendParam('ratio_B2', this.value)"
                   ></webaudio-knob> <webaudio-param link="ratio_B2" fontsize="9"></webaudio-param>
                 </div>
@@ -139,7 +139,7 @@
                 <div class="control-wrapper">
                   <span class="label">FEEDBACK</span>
                   <webaudio-knob  src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
-                    id="feedback_B2" min="0" max="5" value="0" step="0.001" tooltip="Waveform shaper. Morph: Sine › Saw › Noise." 
+                    id="feedback_B2" min="0.001" max="5" value="0.001" step="0.001" log="0.7" tooltip="Waveform shaper. Morph: Sine › Saw › Noise." 
                     onchange="sendParam('feedback_B2', this.value)"   
                   ></webaudio-knob><webaudio-param link="feedback_B2" fontsize="9"></webaudio-param>
                 </div>
@@ -147,7 +147,7 @@
                 <div class="control-wrapper">
                   <span class="label">MOD LEVEL</span>
                   <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
-                    id="level_B2" min="0" max="10" value="0" step="0.001" tooltip="Modulation Depth"
+                    id="level_B2" min="0.001" max="10" value="0.001" step="0.001" log="0.1" tooltip="Modulation Depth  of the ADSR"
                     onchange="sendParam('level_B2', this.value)"
                     ></webaudio-knob><webaudio-param link="level_B2" fontsize="9"></webaudio-param>
                 </div>
@@ -163,7 +163,7 @@
                   <div class="control-wrapper">
                     <span class="label">A</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="attack_B2" min="0" max="2000" value="0" step="0.1" tooltip="ATTACK B2 (ms)" direction="vert"
+                      id="attack_B2" min="1" max="2000" value="1" step="0.1" log="0.1" tooltip="ATTACK B2 (ms)" direction="vert"
                       onchange="sendParam('attack_B2', this.value)"   
                     ></webaudio-slider><webaudio-param link="attack_B2" fontsize="9"></webaudio-param>
                   </div>
@@ -171,7 +171,7 @@
                   <div class="control-wrapper">
                     <span class="label">D</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="decay_B2" min="10" max="3000" value="200" step="0.1" tooltip="DECAY B2 (ms)" direction="vert"
+                      id="decay_B2" min="10" max="3000" value="200" step="0.1" log="0.1" tooltip="DECAY B2 (ms)" direction="vert"
                       onchange="sendParam('decay_B2', this.value)"   
                     ></webaudio-slider><webaudio-param link="decay_B2" fontsize="9"></webaudio-param>
                   </div>
@@ -188,7 +188,7 @@
                   <div class="control-wrapper">
                     <span class="label">R</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="release_B2" min="10" max="2000" value="1500" step="0.1" tooltip="RELEASE B2 (ms)" direction="vert"
+                      id="release_B2" min="10" max="2000" value="1500" step="0.1" log="0.1" tooltip="RELEASE B2 (ms)" direction="vert"
                       onchange="sendParam('release_B2', this.value)"   
                     ></webaudio-slider><webaudio-param link="release_B2" fontsize="9"></webaudio-param>
                   </div>  
@@ -229,7 +229,7 @@
               <div class="control-wrapper">
                 <span class="label">AMOUNT</span>
                 <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
-                  id="lfo1amt" class="horizontal-slider" min="0" max="5" value="0.5" step="0.001" tooltip="LFO 1 MOD AMOUNT"direction="horz"
+                  id="lfo1amt" class="horizontal-slider" min="0.001" max="5" value="0.5" step="0.001" log="0.001" tooltip="LFO 1 MOD AMOUNT"direction="horz"
                   width="100"
                   onchange="sendLfoParam('amount', this.value, 1)"   
                 ></webaudio-slider><webaudio-param link="lfo1amt" fontsize="9"></webaudio-param>
@@ -238,7 +238,7 @@
               <div class="control-wrapper">
                 <span class="label">RATE</span>
                 <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
-                  id="lfo1rate" class="horizontal-slider" min="0.01" max="20" value="1.0" step="0.001" tooltip="LFO 1 FREQUENCY" direction="horz"
+                  id="lfo1rate" class="horizontal-slider" min="0.01" max="20" value="1.0" step="0.001" log="1" tooltip="LFO 1 FREQUENCY" direction="horz"
                   width="100"
                   onchange="sendLfoParam('rate', this.value, 1)"   
                 ></webaudio-slider><webaudio-param link="lfo1rate" fontsize="9"></webaudio-param>
@@ -286,7 +286,7 @@
               <div class="control-wrapper">
                 <span class="label">AMOUNT</span>
                 <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
-                  id="lfo2amt" class="horizontal-slider" min="0" max="5" value="0.5" step="0.001" tooltip="LFO 2 MOD AMOUNT"direction="horz"
+                  id="lfo2amt" class="horizontal-slider" min="0.001" max="5" value="0.5" step="0.001" log="0.001" tooltip="LFO 2 MOD AMOUNT"direction="horz"
                   width="100"
                   onchange="sendLfoParam('amount', this.value, 2)"   
                 ></webaudio-slider><webaudio-param link="lfo2amt" fontsize="9"></webaudio-param>
@@ -295,7 +295,7 @@
               <div class="control-wrapper">
                 <span class="label">RATE</span>
                 <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
-                  id="lfo2rate" class="horizontal-slider" min="0.01" max="20" value="1.0" step="0.001" tooltip="LFO 2 FREQUENCY" direction="horz"
+                  id="lfo2rate" class="horizontal-slider" min="0.01" max="20" value="1.0" step="0.001" log="1" tooltip="LFO 2 FREQUENCY" direction="horz"
                   width="100"
                   onchange="sendLfoParam('rate', this.value, 2)"   
                 ></webaudio-slider><webaudio-param link="lfo2rate" fontsize="9"></webaudio-param>
@@ -324,7 +324,7 @@
             <div class="control-wrapper">
               <span class="label">RATIO</span>
               <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
-                id="ratio_C" min="0.25" max="16.0" value="1" step="0.001" tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
+                id="ratio_C" min="0.25" max="16.0" value="1" step="0.001" log="1"  tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
                 onchange="sendParam('ratio_C', this.value)"
                 ></webaudio-knob>
               <webaudio-param link="ratio_C" fontsize="9"></webaudio-param>
@@ -333,7 +333,7 @@
             <div class="control-wrapper">
               <span class="label">FEEDBACK</span>
               <webaudio-knob  src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
-                id="feedback_C" min="0" max="5" value="0" step="0.001" tooltip="Waveform shaper. Morph: Sine › Saw › Noise."
+                id="feedback_C" min="0.001" max="5" value="0.001" step="0.001" log="0.7" tooltip="Waveform shaper. Morph: Sine › Saw › Noise."
                 onchange="sendParam('feedback_C', this.value)"
               ></webaudio-knob><webaudio-param link="feedback_C" fontsize="9"></webaudio-param>
             </div>
@@ -367,7 +367,7 @@
                   <div class="control-wrapper">
                     <span class="label">A</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="attack_amp" min="5" max="2000" value="10" step="0.1" tooltip="ATTACK amp (ms)" direction="vert"
+                      id="attack_amp" min="5" max="2000" value="10" step="0.1" log="0.1" tooltip="ATTACK amp (ms)" direction="vert"
                       onchange="sendParam('attack_amp', this.value)"   
                     ></webaudio-slider><webaudio-param link="attack_amp" fontsize="9"></webaudio-param>
                   </div>
@@ -375,7 +375,7 @@
                   <div class="control-wrapper">
                     <span class="label">D</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="decay_amp" min="10" max="3000" value="300" step="0.1" tooltip="DECAY amp (ms)" direction="vert"
+                      id="decay_amp" min="10" max="3000" value="300" step="0.1" log="0.1" tooltip="DECAY amp (ms)" direction="vert"
                       onchange="sendParam('decay_amp', this.value)"   
                     ></webaudio-slider><webaudio-param link="decay_amp" fontsize="9"></webaudio-param>
                   </div>
@@ -392,7 +392,7 @@
                   <div class="control-wrapper">
                     <span class="label">R</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="release_amp" min="10" max="2000" value="600" step="0.1" tooltip="RELEASE amp (ms)" direction="vert"
+                      id="release_amp" min="10" max="2000" value="600" step="0.1" log="0.1" tooltip="RELEASE amp (ms)" direction="vert"
                       onchange="sendParam('release_amp', this.value)"   
                     ></webaudio-slider><webaudio-param link="release_amp" fontsize="9"></webaudio-param>
                   </div>  
@@ -413,7 +413,7 @@
                 <div class="control-wrapper">
                   <span class="label">RATIO</span>
                   <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
-                    id="ratio_B1" min="0.25" max="16.0" value="1" step="0.001" tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
+                    id="ratio_B1" min="0.25" max="16.0" value="1" step="0.001" log="1"  tooltip="Frequency Multiplier: for harmonic results use simple values: 0.5, 1, 2, 3 etc"
                     onchange="sendParam('ratio_B1', this.value)"
                   ></webaudio-knob> <webaudio-param link="ratio_B1" fontsize="9"></webaudio-param>
                 </div>
@@ -421,7 +421,7 @@
                 <div class="control-wrapper">
                   <span class="label">FEEDBACK</span>
                   <webaudio-knob  src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
-                    id="feedback_B1" min="0" max="5" value="0" step="0.001" tooltip="Waveform shaper. Morph: Sine › Saw › Noise."
+                    id="feedback_B1" min="0.001" max="5" value="0.001" step="0.001" log="0.7" tooltip="Waveform shaper. Morph: Sine › Saw › Noise."
                     onchange="sendParam('feedback_B1', this.value)"   
                   ></webaudio-knob><webaudio-param link="feedback_B1" fontsize="9"></webaudio-param>
                 </div>
@@ -429,7 +429,7 @@
                 <div class="control-wrapper">
                   <span class="label">MOD LEVEL</span>
                   <webaudio-knob src="/static/img/knobComponents/LittlePhatty.png" diameter="40"
-                    id="level_B1" min="0" max="10" value="0" step="0.001" tooltip="Modulation Depth"
+                    id="level_B1" min="0.001" max="10" value="0.001" step="0.001" log="0.1" tooltip="Modulation Depth  of the ADSR"
                     onchange="sendParam('level_B1', this.value)"
                     ></webaudio-knob><webaudio-param link="level_B1" fontsize="9"></webaudio-param>
                 </div>
@@ -445,7 +445,7 @@
                   <div class="control-wrapper">
                     <span class="label">A</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="attack_B1" min="0" max="2000" value="0" step="0.1" tooltip="ATTACK B1 (ms)" direction="vert"
+                      id="attack_B1" min="1" max="2000" value="1" step="0.1" log="0.1" tooltip="ATTACK B1 (ms)" direction="vert"
                       onchange="sendParam('attack_B1', this.value)"   
                     ></webaudio-slider><webaudio-param link="attack_B1" fontsize="9"></webaudio-param>
                   </div>
@@ -453,7 +453,7 @@
                   <div class="control-wrapper">
                     <span class="label">D</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="decay_B1" min="10" max="3000" value="200" step="0.1" tooltip="DECAY B1 (ms)" direction="vert"
+                      id="decay_B1" min="10" max="3000" value="200" step="0.1" log="0.1" tooltip="DECAY B1 (ms)" direction="vert"
                       onchange="sendParam('decay_B1', this.value)"   
                     ></webaudio-slider><webaudio-param link="decay_B1" fontsize="9"></webaudio-param>
                   </div>
@@ -469,7 +469,7 @@
                   <div class="control-wrapper">
                     <span class="label">R</span>
                     <webaudio-slider src="/static/img/knobComponents/vsliderbody.png" knobsrc="/static/img/knobComponents/vsliderknob.png" width="10" height="90"
-                      id="release_B1" min="10" max="2000" value="1500" step="0.1" tooltip="RELEASE B1 (ms)" direction="vert"
+                      id="release_B1" min="10" max="2000" value="1500" step="0.1" log="0.1" tooltip="RELEASE B1 (ms)" direction="vert"
                       onchange="sendParam('release_B1', this.value)"   
                     ></webaudio-slider><webaudio-param link="release_B1" fontsize="9"></webaudio-param>
                   </div> 
@@ -511,7 +511,7 @@
               <div class="control-wrapper">
                 <span class="label">AMOUNT</span>
                 <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
-                  id="lfo3amt" class="horizontal-slider" min="0" max="5" value="0.5" step="0.001" tooltip="LFO 3 MOD AMOUNT"direction="horz"
+                  id="lfo3amt" class="horizontal-slider" min="0.001" max="5" value="0.5" step="0.001" log="0.001" tooltip="LFO 3 MOD AMOUNT"direction="horz"
                   width="100"
                   onchange="sendLfoParam('amount', this.value, 3)"   
                 ></webaudio-slider><webaudio-param link="lfo3amt" fontsize="9"></webaudio-param>
@@ -520,7 +520,7 @@
               <div class="control-wrapper">
                 <span class="label">RATE</span>
                 <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
-                  id="lfo3rate" class="horizontal-slider" min="0.01" max="20" value="1.0" step="0.001" tooltip="LFO 3 FREQUENCY" direction="horz"
+                  id="lfo3rate" class="horizontal-slider" min="0.01" max="20" value="1.0" step="0.001" log="1" tooltip="LFO 3 FREQUENCY" direction="horz"
                   width="100"
                   onchange="sendLfoParam('rate', this.value, 3)"   
                 ></webaudio-slider><webaudio-param link="lfo3rate" fontsize="9"></webaudio-param>
@@ -567,7 +567,7 @@
               <div class="control-wrapper" style="margin-top:8px;">
                 <span class="label">RELEASE</span>
                 <webaudio-slider src="/static/img/knobComponents/hsliderbody.png" knobsrc="/static/img/knobComponents/hsliderknob.png" width="80" height="15"
-                  id="envrelease" class="horizontal-slider" min="0.001" max="2" value="0.1" step="0.001" tooltip="Envelope Release Time (s)" direction="horz"
+                  id="envrelease" class="horizontal-slider" min="0.001" max="2" value="0.1" step="0.001" log="0.02" tooltip="Envelope Release Time (s)" direction="horz"
                   width="100"
                   onchange="sendEnvParam('release', this.value)"   
                 ></webaudio-slider><webaudio-param link="envrelease" fontsize="9"></webaudio-param>
