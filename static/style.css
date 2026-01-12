@@ -27,6 +27,15 @@ h1{
 webaudio-param{
   margin-top:0.1rem;
 }
+webaudio-knob {
+  position: relative; /* Fondamentale: attiva lo z-index */
+  z-index: 10;        /* Un valore base */
+}
+
+/* Questo è il trucco magico per i tooltip */
+webaudio-knob:hover {
+  z-index: 1000; /* Quando ci passi sopra, vince su tutto */
+}
 /* ------------------- LAYOUT SYNTH --------------------------------------------- */
 .synth-section-container{
   display: flex;
