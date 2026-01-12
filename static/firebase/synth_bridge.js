@@ -102,22 +102,25 @@ function applyPresetState(presetData) {
         // 2 cases: here it's an LFO (array)
         if (Array.isArray(value)) {
             value.forEach((val, index) => {
-                if (val === null) { val = "None"; } // LfoDestination safe conversion
+                let valToSend = val; 
+                if (valToSend === null) { valToSend = "None"; } // LfoDestination safe conversion
+                
                 const suffix = lfoSuffixes[index];
                 const targetId = htmlId + suffix; // e.g. lfo1dest, lfo2amt...
                 
                 // Update single parameter
                 if (typeof window.setValueAndChange === 'function') {
-                    window.setValueAndChange(targetId, val);
+                    window.setValueAndChange(targetId, valToSend);
                 }
             });
 
         } else { // standard case (1 parameter)
-            if (value === null) { value = "None"; } // envDestination safe conversion
+            let valueToSend = value;
+            if (valueToSend === null) { valueToSend = "None"; } // envDestination safe conversion
 
             // Update single parameter
             if (typeof window.setValueAndChange === 'function') {
-                window.setValueAndChange(htmlId, value);
+                window.setValueAndChange(htmlId, valueToSend);
             }
         }
     }
