@@ -151,26 +151,26 @@ function toggleNote(step, midiNote) {
 
 // EVENT LISTENER SCROLL
 gridContainer.addEventListener('wheel', (evt) => {
-    // 1. Blocchiamo sempre lo scroll di default della pagina
+    // 1. prevent default scroll
     evt.preventDefault(); 
 
     if (evt.shiftKey) {
-        // --- CASO A: Tasto SHIFT premuto -> SCROLL ORIZZONTALE ---
+        // --- CASE A: SHIFT held -> Horizontal scroll ---
         gridContainer.scrollLeft += evt.deltaY * 2.1;
     } else {
-        // --- CASO B: Solo rotellina -> CAMBIO OTTAVA ---
+        // --- CASE B: only mouse wheel -> Change octave ---
         scrollAccumulator += evt.deltaY;
 
         if (Math.abs(scrollAccumulator) >= SCROLL_THRESHOLD) {
             const direction = Math.sign(scrollAccumulator) * -1;
             baseOctave += direction;
-            // Limiti: non andare oltre le ottave supportate (0-8)
+            // floor and ceiling: remain inside supported octaves
             if (baseOctave < 0) baseOctave = 0;
             if (baseOctave > 8) baseOctave = 8; 
 
             updateOctave(baseOctave);
             
-            // Resettiamo l'accumulatore dopo il cambio avvenuto
+            // Reset accumulator
             scrollAccumulator = 0;
         }
     }
